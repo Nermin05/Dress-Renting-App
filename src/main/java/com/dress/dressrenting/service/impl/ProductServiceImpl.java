@@ -10,6 +10,7 @@ import com.dress.dressrenting.model.ColorAndSize;
 import com.dress.dressrenting.model.Product;
 import com.dress.dressrenting.model.enums.Color;
 import com.dress.dressrenting.model.enums.Gender;
+import com.dress.dressrenting.model.enums.ProductStatus;
 import com.dress.dressrenting.repository.ProductRepository;
 import com.dress.dressrenting.repository.specification.ProductSpecification;
 import com.dress.dressrenting.service.ProductService;
@@ -34,6 +35,11 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public List<ProductResponseDto> getAll() {
         return productMapper.toDtoList(productRepository.findAll());
+    }
+
+    @Override
+    public List<ProductResponseDto> getAllActive() {
+        return productMapper.toDtoList(productRepository.findByProductStatus(ProductStatus.ACTIVE));
     }
 
     @Override
@@ -148,5 +154,35 @@ public class ProductServiceImpl implements ProductService {
         ProductFilterDto productFilterDto = new ProductFilterDto(subcategoryId, size, gender, color, minPrice, maxPrice);
         List<Product> filtered = productRepository.findAll(ProductSpecification.filter(productFilterDto));
         return productMapper.toDtoList(filtered);
+    }
+
+    @Override
+    public void changeStatus(String productCode, ProductStatus productStatus) {
+        Product product = findByProductCode(productCode);
+        product.setProductStatus(productStatus);
+        productRepository.save(product);
+    }
+
+    @Override
+    public List<ProductResponseDto> approveProduct(String productCode) {
+        Product product = findByProductCode(productCode);
+        product.setProductStatus(ProductStatus.ACTIVE);
+        productRepository.save(product);
+        return productMapper.toDtoList(productRepository.findByProductStatus(ProductStatus.ACTIVE));
+    }
+
+    @Override
+    public List<ProductResponseDto> disapproveProduct(String productCode) {
+        Product product = findByProductCode(productCode);
+        product.setProductStatus(ProductStatus.DELETED);
+        productRepository.save(product);
+        return productMapper.toDtoList(productRepository.findByProductStatus(ProductStatus.ACTIVE));
+    }
+
+    private Product findByProductCode(String productCode) {
+        return productRepository.findByProductCode(productCode).orElseThrow(() -> {
+            log.error("Product not found with id: {}", productCode);
+            return new NotFoundException("Product not found with id: " + productCode);
+        });
     }
 }

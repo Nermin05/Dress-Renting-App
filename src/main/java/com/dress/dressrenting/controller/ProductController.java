@@ -38,7 +38,7 @@ public class ProductController {
 
     @GetMapping
     public ResponseEntity<List<ProductResponseDto>> getAll() {
-        return ResponseEntity.ok(productService.getAll());
+        return ResponseEntity.ok(productService.getAllActive());
     }
 
     @GetMapping("{productCode}")

@@ -1,6 +1,7 @@
 package com.dress.dressrenting.model;
 
 import com.dress.dressrenting.model.enums.Gender;
+import com.dress.dressrenting.model.enums.ProductStatus;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -31,6 +32,8 @@ public class Product {
     BigDecimal price;
     @Enumerated(EnumType.STRING)
     Gender gender;
+    @Enumerated(EnumType.STRING)
+    ProductStatus productStatus;
     Instant createdAt;
 
     @PrePersist
