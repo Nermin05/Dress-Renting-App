@@ -1,19 +1,14 @@
 package com.dress.dressrenting.controller;
 
-import com.dress.dressrenting.dto.request.ColorAndSizeRequestDto;
 import com.dress.dressrenting.dto.request.ProductRequestDto;
 import com.dress.dressrenting.dto.request.UpdatedProductRequestDto;
 import com.dress.dressrenting.dto.response.ProductResponseDto;
 import com.dress.dressrenting.model.enums.Color;
 import com.dress.dressrenting.model.enums.Gender;
+import com.dress.dressrenting.model.enums.OfferType;
+import com.dress.dressrenting.model.enums.ProductCondition;
 import com.dress.dressrenting.service.ProductService;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -25,6 +20,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -37,14 +33,16 @@ public class ProductController {
     private final ProductService productService;
 
     @GetMapping
-    public ResponseEntity<List<ProductResponseDto>> getAll() {
-        return ResponseEntity.ok(productService.getAllActive());
+    public ResponseEntity<List<ProductResponseDto>> getAllByOfferType(@RequestParam OfferType offerType,
+                                                                      @RequestParam ProductCondition productCondition) {
+        return ResponseEntity.ok(productService.getAllByOfferType(offerType,productCondition));
     }
 
     @GetMapping("{productCode}")
     public ResponseEntity<ProductResponseDto> getById(@PathVariable String productCode) {
         return ResponseEntity.ok(productService.getById(productCode));
     }
+
     @PostMapping(value = "/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ProductResponseDto> save(
             @RequestPart("product") String productJson,
@@ -58,13 +56,16 @@ public class ProductController {
             ProductRequestDto productRequestDto = objectMapper.readValue(productJson, ProductRequestDto.class);
             log.info("Parsed product: {}", productRequestDto);
 
+            List<MultipartFile> safeImages = images != null ? images : new ArrayList<>();
+
             return ResponseEntity.status(HttpStatus.CREATED)
-                    .body(productService.save(productRequestDto, images));
+                    .body(productService.save(productRequestDto, safeImages));
         } catch (Exception e) {
-            log.error("JSON parsing error: {}", e.getMessage());
+            log.error("JSON parsing error: {}", e.getMessage(), e);
             throw new RuntimeException("Product JSON parsing error", e);
         }
     }
+
 
     @PutMapping(value = "/{productCode}/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ProductResponseDto> update(

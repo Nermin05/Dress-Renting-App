@@ -1,6 +1,7 @@
 package com.dress.dressrenting.model;
 
 import com.dress.dressrenting.model.enums.Color;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -40,5 +41,6 @@ public class ColorAndSize {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "product_id")
+    @JsonBackReference
     Product product;
 }
