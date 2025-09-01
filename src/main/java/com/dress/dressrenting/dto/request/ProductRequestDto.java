@@ -7,7 +7,6 @@ import java.util.List;
 
 @Data
 public class ProductRequestDto {
-    private Long userId;
     private Long subcategoryId;
     private List<ColorAndSizeRequestDto> colorAndSizes;
     private Gender gender;

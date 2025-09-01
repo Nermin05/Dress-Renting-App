@@ -6,17 +6,18 @@ import com.dress.dressrenting.dto.request.UpdatedProductRequestDto;
 import com.dress.dressrenting.dto.response.ProductResponseDto;
 import com.dress.dressrenting.exception.exceptions.NotFoundException;
 import com.dress.dressrenting.mapper.ProductMapper;
-import com.dress.dressrenting.model.ColorAndSize;
-import com.dress.dressrenting.model.Product;
-import com.dress.dressrenting.model.ProductOffer;
+import com.dress.dressrenting.model.*;
 import com.dress.dressrenting.model.enums.*;
 import com.dress.dressrenting.repository.ProductOfferRepository;
 import com.dress.dressrenting.repository.ProductRepository;
+import com.dress.dressrenting.repository.UserRepository;
 import com.dress.dressrenting.repository.specification.ProductSpecification;
 import com.dress.dressrenting.service.ProductService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -36,11 +37,13 @@ public class ProductServiceImpl implements ProductService {
     private final ProductRepository productRepository;
     private final ProductMapper productMapper;
     private final ProductOfferRepository productOfferRepository;
+    private final UserRepository userRepository;
 
     @Override
     public List<ProductResponseDto> getAll() {
         return productMapper.toDtoList(productRepository.findAll());
     }
+
     @Override
     public List<ProductResponseDto> getAllByOfferType(OfferType offerType, ProductCondition productCondition) {
         List<Product> products = productRepository.findAll().stream()
@@ -61,7 +64,6 @@ public class ProductServiceImpl implements ProductService {
     }
 
 
-
     @Override
     public ProductResponseDto getById(String productCode) {
         return productMapper.toDto(productRepository.findByProductCode(productCode).orElseThrow(() -> new NotFoundException("Product not found with id: " + productCode)));
@@ -69,7 +71,20 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public ProductResponseDto save(ProductRequestDto productRequestDto, List<MultipartFile> images) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        Long userId;
+        if (authentication != null && authentication.isAuthenticated()) {
+            CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+            userId = userDetails.getId();
+        } else {
+            userId = null;
+        }
+        User user = userRepository.findById(userId).orElseThrow(() -> {
+            log.error("User not found with username: {}", userId);
+            return new IllegalArgumentException("User not found with username: " + userId);
+        });
         Product product = productMapper.toEntity(productRequestDto);
+        product.setUser(user);
         product = productRepository.save(product);
 
         Product finalProduct = product;

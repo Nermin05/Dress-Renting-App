@@ -14,7 +14,6 @@ import java.util.List;
 @Mapper(componentModel = "spring")
 public interface ProductMapper {
     @Mapping(target = "id", ignore = true)
-    @Mapping(target = "user", expression = "java(mapUser(productRequestDto.getUserId()))")
     @Mapping(target = "createdAt", ignore = true)
     Product toEntity(ProductRequestDto productRequestDto);
 
@@ -31,10 +30,10 @@ public interface ProductMapper {
 
     List<ColorAndSize> toColorAndSizeList(List<ColorAndSizeRequestDto> dtos);
 
-    default User mapUser(Long userId) {
-        if (userId == null) return null;
-        User user = new User();
-        user.setId(userId);
-        return user;
-    }
+//    default User mapUser(Long userId) {
+//        if (userId == null) return null;
+//        User user = new User();
+//        user.setId(userId);
+//        return user;
+//    }
 }
