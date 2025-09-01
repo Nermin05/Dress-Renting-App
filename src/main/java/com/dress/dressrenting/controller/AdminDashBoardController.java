@@ -6,7 +6,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -20,11 +19,6 @@ import java.util.List;
 @PreAuthorize("hasRole('ADMIN')")
 public class AdminDashBoardController {
     private final ProductService productService;
-
-    @GetMapping("/all-products")
-    public ResponseEntity<List<ProductResponseDto>> getAll() {
-        return ResponseEntity.ok(productService.getAll());
-    }
 
     @PostMapping("/approve-product")
     public ResponseEntity<List<ProductResponseDto>> approveProduct(String productCode) {

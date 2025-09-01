@@ -32,9 +32,13 @@ import java.util.List;
 public class ProductController {
     private final ProductService productService;
 
-    @GetMapping
-    public ResponseEntity<List<ProductResponseDto>> getAllByOfferType(@RequestParam OfferType offerType,
-                                                                      @RequestParam ProductCondition productCondition) {
+    @GetMapping("/all-products")
+    public ResponseEntity<List<ProductResponseDto>> getAll() {
+        return ResponseEntity.ok(productService.getAll());
+    }
+
+    @GetMapping("get-by-Offer-Type")
+    public ResponseEntity<List<ProductResponseDto>> getAllByOfferType(@RequestParam OfferType offerType, @RequestParam ProductCondition productCondition) {
         return ResponseEntity.ok(productService.getAllByOfferType(offerType,productCondition));
     }
 
