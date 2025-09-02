@@ -72,17 +72,24 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public ProductResponseDto save(ProductRequestDto productRequestDto, List<MultipartFile> images) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        Long userId;
+
+        User user;
         if (authentication != null && authentication.isAuthenticated()) {
-            CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
-            userId = userDetails.getId();
+            Object principal = authentication.getPrincipal();
+
+            if (principal instanceof CustomUserDetails userDetails) {
+                user = userRepository.findById(userDetails.getId())
+                        .orElseThrow(() -> new IllegalArgumentException("User not found with id: " + userDetails.getId()));
+            } else if (principal instanceof String email) {
+                user = userRepository.findByEmail(email)
+                        .orElseThrow(() -> new IllegalArgumentException("User not found with email: " + email));
+            } else {
+                throw new IllegalStateException("Unknown principal type: " + principal.getClass());
+            }
         } else {
-            userId = null;
+            throw new IllegalArgumentException("No authenticated user found");
         }
-        User user = userRepository.findById(userId).orElseThrow(() -> {
-            log.error("User not found with username: {}", userId);
-            return new IllegalArgumentException("User not found with username: " + userId);
-        });
+
         Product product = productMapper.toEntity(productRequestDto);
         product.setUser(user);
         product = productRepository.save(product);
@@ -113,12 +120,7 @@ public class ProductServiceImpl implements ProductService {
                 })
                 .collect(Collectors.toList());
 
-        if (product.getColorAndSizes() == null) {
-            product.setColorAndSizes(new ArrayList<>());
-        } else {
-            product.getColorAndSizes().clear();
-        }
-        product.getColorAndSizes().addAll(colorAndSizes);
+        product.setColorAndSizes(colorAndSizes);
 
         if (product.getProductCode() == null) {
             product.setProductCode(String.format("%04d", product.getId()));
@@ -156,12 +158,7 @@ public class ProductServiceImpl implements ProductService {
                 })
                 .collect(Collectors.toList());
 
-        if (product.getProductOffers() == null) {
-            product.setProductOffers(new ArrayList<>());
-        } else {
-            product.getProductOffers().clear();
-        }
-        product.getProductOffers().addAll(offers);
+        product.setProductOffers(offers);
         productOfferRepository.saveAll(offers);
 
         BigDecimal productPrice = offers.stream()
