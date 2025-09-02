@@ -122,10 +122,11 @@ public class ProductServiceImpl implements ProductService {
 
         product.setColorAndSizes(colorAndSizes);
 
-        if (product.getProductCode() == null) {
+        if ("TEMP".equals(product.getProductCode())) {
             product.setProductCode(String.format("%04d", product.getId()));
             product = productRepository.save(product);
         }
+
 
         Product finalProduct1 = product;
 

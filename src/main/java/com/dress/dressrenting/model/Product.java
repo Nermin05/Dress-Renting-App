@@ -45,5 +45,9 @@ public class Product {
         createdAt = Instant.now();
         productStatus = ProductStatus.ACTIVE;
 
+        if (productCode == null) {
+            productCode = "TEMP";
+        }
     }
+
 }
