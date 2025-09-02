@@ -23,10 +23,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -71,41 +68,44 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public ProductResponseDto save(ProductRequestDto productRequestDto, List<MultipartFile> images) {
+
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
-        User user;
-        if (authentication != null && authentication.isAuthenticated()) {
-            Object principal = authentication.getPrincipal();
-
-            if (principal instanceof CustomUserDetails userDetails) {
-                user = userRepository.findById(userDetails.getId())
-                        .orElseThrow(() -> new IllegalArgumentException("User not found with id: " + userDetails.getId()));
-            } else if (principal instanceof String email) {
-                user = userRepository.findByEmail(email)
-                        .orElseThrow(() -> new IllegalArgumentException("User not found with email: " + email));
-            } else {
-                throw new IllegalStateException("Unknown principal type: " + principal.getClass());
-            }
-        } else {
+        if (authentication == null || !authentication.isAuthenticated()) {
             throw new IllegalArgumentException("No authenticated user found");
+        }
+
+        Object principal = authentication.getPrincipal();
+        User user;
+
+        if (principal instanceof CustomUserDetails userDetails) {
+            user = userRepository.findById(userDetails.getId())
+                    .orElseThrow(() -> new IllegalArgumentException("User not found with id: " + userDetails.getId()));
+        } else if (principal instanceof String email) {
+            user = userRepository.findByEmail(email)
+                    .orElseThrow(() -> new IllegalArgumentException("User not found with email: " + email));
+        } else {
+            throw new IllegalStateException("Unknown principal type: " + principal.getClass());
         }
 
         Product product = productMapper.toEntity(productRequestDto);
         product.setUser(user);
-        product = productRepository.save(product);
 
+        product = productRepository.save(product);
         Product finalProduct = product;
 
-        List<ColorAndSize> colorAndSizes = productRequestDto.getColorAndSizes()
+        List<ColorAndSize> colorAndSizes = Optional.ofNullable(productRequestDto.getColorAndSizes())
+                .orElse(Collections.emptyList())
                 .stream()
                 .map(colorDto -> {
                     ColorAndSize colorAndSize = productMapper.toColorAndSize(colorDto);
 
-                    List<String> urls = (images != null ? images : Collections.emptyList())
+                    List<String> urls = Optional.ofNullable(images)
+                            .orElse(Collections.emptyList())
                             .stream()
                             .map(file -> {
                                 try {
-                                    return cloudinaryService.upload((MultipartFile) file).get("url").toString();
+                                    return cloudinaryService.upload(file).get("url").toString();
                                 } catch (IOException e) {
                                     throw new RuntimeException("Image upload failed", e);
                                 }
@@ -122,15 +122,14 @@ public class ProductServiceImpl implements ProductService {
 
         product.setColorAndSizes(colorAndSizes);
 
-        if ("TEMP".equals(product.getProductCode())) {
+        if (product.getProductCode() == null || "TEMP".equals(product.getProductCode())) {
             product.setProductCode(String.format("%04d", product.getId()));
             product = productRepository.save(product);
         }
 
-
         Product finalProduct1 = product;
-
-        List<ProductOffer> offers = productRequestDto.getProductOffers()
+        List<ProductOffer> offers = Optional.ofNullable(productRequestDto.getProductOffers())
+                .orElse(Collections.emptyList())
                 .stream()
                 .map(dto -> {
                     if (dto.offerType() == OfferType.RENT && dto.rentDuration() == null) {
@@ -172,6 +171,7 @@ public class ProductServiceImpl implements ProductService {
 
         return productMapper.toDto(product);
     }
+
 
 
     @Transactional
