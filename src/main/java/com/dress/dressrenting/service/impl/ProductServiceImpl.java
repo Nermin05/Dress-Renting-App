@@ -68,9 +68,7 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public ProductResponseDto save(ProductRequestDto productRequestDto, List<MultipartFile> images) {
-
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-
         if (authentication == null || !authentication.isAuthenticated()) {
             throw new IllegalArgumentException("No authenticated user found");
         }
@@ -90,8 +88,7 @@ public class ProductServiceImpl implements ProductService {
 
         Product product = productMapper.toEntity(productRequestDto);
         product.setUser(user);
-
-        product = productRepository.save(product);
+        product = productRepository.save(product); // ID yaranır
         Product finalProduct = product;
 
         List<ColorAndSize> colorAndSizes = Optional.ofNullable(productRequestDto.getColorAndSizes())
@@ -120,12 +117,18 @@ public class ProductServiceImpl implements ProductService {
                 })
                 .collect(Collectors.toList());
 
-        product.setColorAndSizes(colorAndSizes);
+        if (product.getColorAndSizes() == null) {
+            product.setColorAndSizes(new ArrayList<>());
+        } else {
+            product.getColorAndSizes().clear();
+        }
+        product.getColorAndSizes().addAll(colorAndSizes);
 
         product.setProductCode(String.format("%04d", product.getId()));
         product = productRepository.save(product);
 
         Product finalProduct1 = product;
+
         List<ProductOffer> offers = Optional.ofNullable(productRequestDto.getProductOffers())
                 .orElse(Collections.emptyList())
                 .stream()
@@ -156,20 +159,24 @@ public class ProductServiceImpl implements ProductService {
                 })
                 .collect(Collectors.toList());
 
-        product.setProductOffers(offers);
+        if (product.getProductOffers() == null) {
+            product.setProductOffers(new ArrayList<>());
+        } else {
+            product.getProductOffers().clear();
+        }
+        product.getProductOffers().addAll(offers);
         productOfferRepository.saveAll(offers);
 
         BigDecimal productPrice = offers.stream()
                 .map(ProductOffer::getPrice)
                 .max(Comparator.naturalOrder())
                 .orElse(BigDecimal.ZERO);
-
         product.setPrice(productPrice);
+
         product = productRepository.save(product);
 
         return productMapper.toDto(product);
     }
-
 
     @Transactional
     @Override
