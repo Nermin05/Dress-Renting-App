@@ -2,6 +2,7 @@ package com.dress.dressrenting.provider;
 
 import com.dress.dressrenting.exception.exceptions.InvalidInputException;
 import com.dress.dressrenting.exception.exceptions.UnMatchedPasswordException;
+import com.dress.dressrenting.model.CustomUserDetails;
 import com.dress.dressrenting.model.User;
 import com.dress.dressrenting.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -29,10 +30,12 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
         String email = authentication.getName();
         String password = authentication.getCredentials().toString();
+
         User user = userRepository.findByEmail(email).orElseThrow(() -> {
             log.error("User not found with username: {}", email);
             return new InvalidInputException("User not found with username: " + email);
         });
+
         if (!user.getActive()) {
             throw new DisabledException("User is not active");
         }
@@ -40,9 +43,15 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
         if (!passwordEncoder.matches(password, user.getPassword())) {
             throw new UnMatchedPasswordException("Invalid email or password");
         }
-        SimpleGrantedAuthority authority = new SimpleGrantedAuthority(user.getUserRole().name());
-        return new UsernamePasswordAuthenticationToken(email, password, Collections.singleton(authority));
+        CustomUserDetails userDetails = new CustomUserDetails(user);
+
+        return new UsernamePasswordAuthenticationToken(
+                userDetails,
+                null,
+                userDetails.getAuthorities()
+        );
     }
+
 
     @Override
     public boolean supports(Class<?> authentication) {
