@@ -49,25 +49,13 @@ public class ProductController {
 
     @PostMapping(value = "/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ProductResponseDto> save(
-            @RequestPart("product") String productJson,
+            @RequestPart("product") ProductRequestDto productRequestDto,
             @RequestPart(value = "images", required = false) List<MultipartFile> images) {
 
-        log.info("Received product JSON: {}", productJson);
-        log.info("Received images count: {}", images != null ? images.size() : 0);
+        log.info("Parsed product: {}", productRequestDto);
 
-        try {
-            ObjectMapper objectMapper = new ObjectMapper();
-            ProductRequestDto productRequestDto = objectMapper.readValue(productJson, ProductRequestDto.class);
-            log.info("Parsed product: {}", productRequestDto);
-
-            List<MultipartFile> safeImages = images != null ? images : new ArrayList<>();
-
-            return ResponseEntity.status(HttpStatus.CREATED)
-                    .body(productService.save(productRequestDto, safeImages));
-        } catch (Exception e) {
-            log.error("JSON parsing error: {}", e.getMessage(), e);
-            throw new RuntimeException("Product JSON parsing error", e);
-        }
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(productService.save(productRequestDto, images != null ? images : new ArrayList<>()));
     }
 
 
