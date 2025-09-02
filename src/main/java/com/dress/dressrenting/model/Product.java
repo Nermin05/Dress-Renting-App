@@ -46,8 +46,9 @@ public class Product {
         productStatus = ProductStatus.ACTIVE;
 
         if (productCode == null) {
-            productCode = "TEMP";
+            productCode = "TEMP-" + System.currentTimeMillis();
         }
     }
+
 
 }

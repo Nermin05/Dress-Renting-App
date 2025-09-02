@@ -122,10 +122,8 @@ public class ProductServiceImpl implements ProductService {
 
         product.setColorAndSizes(colorAndSizes);
 
-        if (product.getProductCode() == null || "TEMP".equals(product.getProductCode())) {
-            product.setProductCode(String.format("%04d", product.getId()));
-            product = productRepository.save(product);
-        }
+        product.setProductCode(String.format("%04d", product.getId()));
+        product = productRepository.save(product);
 
         Product finalProduct1 = product;
         List<ProductOffer> offers = Optional.ofNullable(productRequestDto.getProductOffers())
@@ -171,7 +169,6 @@ public class ProductServiceImpl implements ProductService {
 
         return productMapper.toDto(product);
     }
-
 
 
     @Transactional
