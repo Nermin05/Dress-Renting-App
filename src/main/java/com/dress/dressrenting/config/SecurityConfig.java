@@ -59,9 +59,6 @@ public class SecurityConfig {
                                 "/api/v1/products/**",
                                 "/api/v1/products/filter"
                         ).permitAll()
-                        .requestMatchers(HttpMethod.POST, "/api/v1/products/upload").authenticated()
-                        .requestMatchers(HttpMethod.PUT, "/api/v1/products/*/upload").authenticated()
-                        .requestMatchers(HttpMethod.DELETE, "/api/v1/products/**").authenticated()
                         .requestMatchers("/api/v1/admin-controller/**").hasAuthority("ADMIN")
                         .anyRequest().authenticated()
                 )
