@@ -40,6 +40,11 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    public List<ProductResponseDto> getApprovedProducts() {
+        return productMapper.toDtoList(productRepository.findByProductStatus(ProductStatus.ACTIVE));
+    }
+
+    @Override
     public List<ProductResponseDto> getAllByOfferType(OfferType offerType, ProductCondition productCondition) {
         List<Product> products = productRepository.findAll().stream()
                 .filter(product -> ProductStatus.ACTIVE.equals(product.getProductStatus()))

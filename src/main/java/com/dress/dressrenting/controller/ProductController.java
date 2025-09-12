@@ -34,10 +34,10 @@ public class ProductController {
 
     @GetMapping("/all-products")
     public ResponseEntity<List<ProductResponseDto>> getAll() {
-        return ResponseEntity.ok(productService.getAll());
+        return ResponseEntity.ok(productService.getApprovedProducts());
     }
 
-    @GetMapping("get-by-Offer-Type")
+    @GetMapping("/get-by-Offer-Type")
     public ResponseEntity<List<ProductResponseDto>> getAllByOfferType(@RequestParam OfferType offerType, @RequestParam ProductCondition productCondition) {
         return ResponseEntity.ok(productService.getAllByOfferType(offerType,productCondition));
     }

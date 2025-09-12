@@ -12,6 +12,8 @@ import java.util.List;
 public interface ProductService {
     List<ProductResponseDto> getAll();
 
+    List<ProductResponseDto> getApprovedProducts();
+
     List<ProductResponseDto> getAllByOfferType(OfferType offerType, ProductCondition productCondition);
 
 
