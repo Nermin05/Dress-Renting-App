@@ -57,7 +57,11 @@ public class SecurityConfig {
                                 "/swagger-ui.html",
                                 "/api/v1/products",
                                 "/api/v1/products/**",
-                                "/api/v1/products/filter"
+                                "/api/v1/products/filter",
+                                "/api/categories",
+                                "/api/categories/**",
+                                "/api/sub-categories",
+                                "/api/sub-categories/**"
                         ).permitAll()
                         .requestMatchers("/api/v1/admin-controller/**").hasAuthority("ADMIN")
                         .anyRequest().authenticated()

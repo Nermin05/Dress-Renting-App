@@ -16,8 +16,6 @@ import com.dress.dressrenting.service.ProductService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -68,27 +66,10 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public ProductResponseDto save(ProductRequestDto productRequestDto, List<MultipartFile> images) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication == null || !authentication.isAuthenticated()) {
-            throw new IllegalArgumentException("No authenticated user found");
-        }
-
-        Object principal = authentication.getPrincipal();
-        User user;
-
-        if (principal instanceof CustomUserDetails userDetails) {
-            user = userRepository.findById(userDetails.getId())
-                    .orElseThrow(() -> new IllegalArgumentException("User not found with id: " + userDetails.getId()));
-        } else if (principal instanceof String email) {
-            user = userRepository.findByEmail(email)
-                    .orElseThrow(() -> new IllegalArgumentException("User not found with email: " + email));
-        } else {
-            throw new IllegalStateException("Unknown principal type: " + principal.getClass());
-        }
 
         Product product = productMapper.toEntity(productRequestDto);
-        product.setUser(user);
-        product = productRepository.save(product); // ID yaranır
+        product.setUser(null);
+        product = productRepository.save(product);
         Product finalProduct = product;
 
         List<ColorAndSize> colorAndSizes = Optional.ofNullable(productRequestDto.getColorAndSizes())
