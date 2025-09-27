@@ -1,6 +1,6 @@
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/dressdb
+    url: jdbc:postgresql://localhost:5432/dress_renting
     username: postgres
     password: nermin123
     driver-class-name: org.postgresql.Driver
