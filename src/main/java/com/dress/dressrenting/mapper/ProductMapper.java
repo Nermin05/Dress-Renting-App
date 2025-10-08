@@ -18,6 +18,10 @@ public interface ProductMapper {
     Product toEntity(ProductRequestDto productRequestDto);
 
     @Mapping(target = "userId", source = "user.id")
+    @Mapping(target = "userName", source = "user.name")
+    @Mapping(target = "userSurname", source = "user.surname")
+    @Mapping(target = "userEmail", source = "user.email")
+    @Mapping(target = "userPhone", source = "user.phone")
     ProductResponseDto toDto(Product product);
 
     List<ProductResponseDto> toDtoList(List<Product> products);

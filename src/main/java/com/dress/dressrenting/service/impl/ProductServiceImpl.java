@@ -73,7 +73,14 @@ public class ProductServiceImpl implements ProductService {
     public ProductResponseDto save(ProductRequestDto productRequestDto, List<MultipartFile> images) {
 
         Product product = productMapper.toEntity(productRequestDto);
-        product.setUser(null);
+        User user=new User();
+        user.setName(productRequestDto.getUserName());
+        user.setSurname(productRequestDto.getUserSurname());
+        user.setEmail(productRequestDto.getUserEmail());
+        user.setPhone(productRequestDto.getUserPhone());
+        user.setUserRole(UserRole.USER);
+        user=userRepository.save(user);
+        product.setUser(user);
         product = productRepository.save(product);
         Product finalProduct = product;
 

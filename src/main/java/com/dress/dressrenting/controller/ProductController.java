@@ -11,6 +11,7 @@ import com.dress.dressrenting.service.ProductService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -49,7 +50,7 @@ public class ProductController {
 
     @PostMapping(value = "/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ProductResponseDto> save(
-            @RequestPart("product") ProductRequestDto productRequestDto,
+            @RequestPart("product") @Valid ProductRequestDto productRequestDto,
             @RequestPart(value = "images", required = false) List<MultipartFile> images) {
 
         log.info("Parsed product: {}", productRequestDto);

@@ -9,6 +9,10 @@ import java.time.Instant;
 import java.util.List;
 
 public record ProductResponseDto(
+        String userName,
+        String userSurname,
+        String userEmail,
+        String userPhone,
         String productCode,
         Long subcategoryId,
         BigDecimal price,
