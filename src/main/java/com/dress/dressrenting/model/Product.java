@@ -43,7 +43,7 @@ public class Product {
     @PrePersist
     void prePersist() {
         createdAt = Instant.now();
-        productStatus = ProductStatus.ACTIVE;
+        productStatus = ProductStatus.PENDING;
 
         if (productCode == null) {
             productCode = "TEMP-" + System.currentTimeMillis();

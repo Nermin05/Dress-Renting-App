@@ -8,6 +8,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Map;
 
 public interface ProductService {
     List<ProductResponseDto> getAll();
@@ -19,7 +20,7 @@ public interface ProductService {
 
     ProductResponseDto getById(String productCode);
 
-    ProductResponseDto save(ProductRequestDto productRequestDto, List<MultipartFile> images);
+    ProductResponseDto save(ProductRequestDto productRequestDto, Map<String, List<MultipartFile>> colorImages);
 
     ProductResponseDto update(String productCode, UpdatedProductRequestDto productRequestDto, List<MultipartFile> images);
 

@@ -17,12 +17,14 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/v1/products")
@@ -40,7 +42,7 @@ public class ProductController {
 
     @GetMapping("/get-by-Offer-Type")
     public ResponseEntity<List<ProductResponseDto>> getAllByOfferType(@RequestParam OfferType offerType, @RequestParam ProductCondition productCondition) {
-        return ResponseEntity.ok(productService.getAllByOfferType(offerType,productCondition));
+        return ResponseEntity.ok(productService.getAllByOfferType(offerType, productCondition));
     }
 
     @GetMapping("{productCode}")
@@ -51,12 +53,19 @@ public class ProductController {
     @PostMapping(value = "/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ProductResponseDto> save(
             @RequestPart("product") @Valid ProductRequestDto productRequestDto,
-            @RequestPart(value = "images", required = false) List<MultipartFile> images) {
+            @RequestParam MultiValueMap<String, MultipartFile> filesMap) {
 
-        log.info("Parsed product: {}", productRequestDto);
+        Map<String, List<MultipartFile>> colorImages = new HashMap<>();
+
+        filesMap.forEach((key, value) -> {
+            if (key.startsWith("images_")) {
+                String colorKey = key.substring("images_".length()).toUpperCase();
+                colorImages.put(colorKey, value);
+            }
+        });
 
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(productService.save(productRequestDto, images != null ? images : new ArrayList<>()));
+                .body(productService.save(productRequestDto, colorImages));
     }
 
 

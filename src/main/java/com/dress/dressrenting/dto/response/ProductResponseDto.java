@@ -1,6 +1,5 @@
 package com.dress.dressrenting.dto.response;
 
-import com.dress.dressrenting.model.ColorAndSize;
 import com.dress.dressrenting.model.ProductOffer;
 import com.dress.dressrenting.model.enums.Gender;
 
@@ -18,8 +17,7 @@ public record ProductResponseDto(
         BigDecimal price,
         Gender gender,
         Long userId,
-        List<ColorAndSize> colorAndSizes,
+        List<ColorAndSizeResponseDto> colorAndSizes,
         Instant createdAt,
-        List<ProductOffer> offers
-) {
+        List<ProductOffer> offers) {
 }

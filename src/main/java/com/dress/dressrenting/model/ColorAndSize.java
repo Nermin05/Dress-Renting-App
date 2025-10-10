@@ -7,7 +7,6 @@ import lombok.*;
 import lombok.experimental.FieldDefaults;
 
 import java.util.List;
-import java.util.Map;
 
 @Entity
 @Table(name = "product_color_sizes")
@@ -26,18 +25,12 @@ public class ColorAndSize {
 
     Integer photoCount;
 
-    Long stock;
+    String size;
 
     @ElementCollection
     @CollectionTable(name = "product_images", joinColumns = @JoinColumn(name = "color_size_id"))
     @Column(name = "image_url")
     List<String> imageUrls;
-
-    @ElementCollection
-    @CollectionTable(name = "product_size_stock", joinColumns = @JoinColumn(name = "color_size_id"))
-    @MapKeyColumn(name = "size")
-    @Column(name = "stock")
-    Map<String, Long> sizeStockMap;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "product_id")

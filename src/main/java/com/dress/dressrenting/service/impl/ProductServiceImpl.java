@@ -6,7 +6,10 @@ import com.dress.dressrenting.dto.request.UpdatedProductRequestDto;
 import com.dress.dressrenting.dto.response.ProductResponseDto;
 import com.dress.dressrenting.exception.exceptions.NotFoundException;
 import com.dress.dressrenting.mapper.ProductMapper;
-import com.dress.dressrenting.model.*;
+import com.dress.dressrenting.model.ColorAndSize;
+import com.dress.dressrenting.model.Product;
+import com.dress.dressrenting.model.ProductOffer;
+import com.dress.dressrenting.model.User;
 import com.dress.dressrenting.model.enums.*;
 import com.dress.dressrenting.repository.ProductOfferRepository;
 import com.dress.dressrenting.repository.ProductRepository;
@@ -70,18 +73,22 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public ProductResponseDto save(ProductRequestDto productRequestDto, List<MultipartFile> images) {
+    public ProductResponseDto save(ProductRequestDto productRequestDto,
+                                   Map<String, List<MultipartFile>> colorImages) {
 
         Product product = productMapper.toEntity(productRequestDto);
-        User user=new User();
+
+        User user = new User();
         user.setName(productRequestDto.getUserName());
         user.setSurname(productRequestDto.getUserSurname());
         user.setEmail(productRequestDto.getUserEmail());
         user.setPhone(productRequestDto.getUserPhone());
         user.setUserRole(UserRole.USER);
-        user=userRepository.save(user);
+        user = userRepository.save(user);
+
         product.setUser(user);
         product = productRepository.save(product);
+
         Product finalProduct = product;
 
         List<ColorAndSize> colorAndSizes = Optional.ofNullable(productRequestDto.getColorAndSizes())
@@ -90,9 +97,11 @@ public class ProductServiceImpl implements ProductService {
                 .map(colorDto -> {
                     ColorAndSize colorAndSize = productMapper.toColorAndSize(colorDto);
 
-                    List<String> urls = Optional.ofNullable(images)
-                            .orElse(Collections.emptyList())
-                            .stream()
+                    String colorKey = (colorDto.getColor().name() + "_" + colorDto.getSize()).toUpperCase();
+
+                    List<MultipartFile> files = colorImages.getOrDefault(colorKey, Collections.emptyList());
+
+                    List<String> urls = files.stream()
                             .map(file -> {
                                 try {
                                     return cloudinaryService.upload(file).get("url").toString();
@@ -106,9 +115,11 @@ public class ProductServiceImpl implements ProductService {
                     colorAndSize.setPhotoCount(urls.size());
                     colorAndSize.setProduct(finalProduct);
 
+                    colorAndSize.setSize(colorDto.getSize());
+
                     return colorAndSize;
                 })
-                .collect(Collectors.toList());
+                .toList();
 
         if (product.getColorAndSizes() == null) {
             product.setColorAndSizes(new ArrayList<>());
@@ -164,12 +175,13 @@ public class ProductServiceImpl implements ProductService {
                 .map(ProductOffer::getPrice)
                 .max(Comparator.naturalOrder())
                 .orElse(BigDecimal.ZERO);
-        product.setPrice(productPrice);
 
+        product.setPrice(productPrice);
         product = productRepository.save(product);
 
         return productMapper.toDto(product);
     }
+
 
     @Transactional
     @Override
@@ -181,13 +193,12 @@ public class ProductServiceImpl implements ProductService {
         product.setGender(requestDto.gender());
 
         List<ColorAndSize> updatedColorAndSizes = product.getColorAndSizes().stream()
-                .map(cs -> {
+                .peek(cs -> {
                     List<String> kept = cs.getImageUrls().stream()
                             .filter(url -> requestDto.keptImageUrls().contains(url))
                             .toList();
                     cs.setImageUrls(kept);
                     cs.setPhotoCount(kept.size());
-                    return cs;
                 })
                 .toList();
 
