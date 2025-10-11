@@ -81,7 +81,9 @@ public class SecurityConfig {
         configuration.setAllowedOrigins(List.of(
                 "http://localhost:5173",
                 "http://localhost:8081",
-                "http://109.123.252.254"
+                "http://109.123.252.254",
+                "https://weshare.az",
+                "https://www.weshare.az"
         ));        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("*"));
         configuration.setAllowCredentials(true);
