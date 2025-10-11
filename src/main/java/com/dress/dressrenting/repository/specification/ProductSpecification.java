@@ -3,6 +3,7 @@ package com.dress.dressrenting.repository.specification;
 import com.dress.dressrenting.dto.request.ProductFilterDto;
 import com.dress.dressrenting.model.ColorAndSize;
 import com.dress.dressrenting.model.Product;
+import com.dress.dressrenting.model.enums.ProductStatus;
 import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.Predicate;
 import org.springframework.data.jpa.domain.Specification;
@@ -14,6 +15,8 @@ public class ProductSpecification {
     public static Specification<Product> filter(ProductFilterDto productFilterDto) {
         return (root, query, criteriaBuilder) -> {
             Predicate predicates = criteriaBuilder.conjunction();
+
+            predicates=criteriaBuilder.and(predicates,criteriaBuilder.equal(root.get("productStatus"), ProductStatus.ACTIVE));
 
             if (productFilterDto.subcategoryId() != null) {
                 predicates = criteriaBuilder.and(predicates, criteriaBuilder.equal(root.get("subcategoryId"), productFilterDto.subcategoryId()));
@@ -38,6 +41,7 @@ public class ProductSpecification {
             if (productFilterDto.maxPrice() != null) {
                 predicates = criteriaBuilder.and(predicates, criteriaBuilder.lessThanOrEqualTo(root.get("price"), productFilterDto.maxPrice()));
             }
+
             return predicates;
         };
     }
