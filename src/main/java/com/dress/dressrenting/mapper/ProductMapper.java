@@ -24,6 +24,7 @@ public interface ProductMapper {
     @Mapping(target = "userEmail", source = "user.email")
     @Mapping(target = "userPhone", source = "user.phone")
     @Mapping(target = "subcategoryId", source = "subcategoryId")
+    @Mapping(target = "description", source = "description")
     @Mapping(target = "gender", expression = "java(product.getGender())")
     @Mapping(target = "colorAndSizes", expression = "java(mapColorAndSizes(product.getColorAndSizes()))")
     @Mapping(target = "offers", source = "productOffers")

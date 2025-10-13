@@ -31,6 +31,7 @@ public class Product {
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference
     List<ColorAndSize> colorAndSizes;
+    String description;
     BigDecimal price;
     @Enumerated(EnumType.STRING)
     Gender gender;

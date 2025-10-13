@@ -18,6 +18,8 @@ public class ProductRequestDto {
     @Email
     private String userEmail;
     @NotBlank
+    private String description;
+    @NotBlank
     @Pattern(
             regexp = "^(\\+994|0)(50|51|55|70|77|99)\\d{7}$"
     )
