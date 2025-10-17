@@ -6,10 +6,7 @@ import com.dress.dressrenting.dto.request.UpdatedProductRequestDto;
 import com.dress.dressrenting.dto.response.ProductResponseDto;
 import com.dress.dressrenting.exception.exceptions.NotFoundException;
 import com.dress.dressrenting.mapper.ProductMapper;
-import com.dress.dressrenting.model.ColorAndSize;
-import com.dress.dressrenting.model.Product;
-import com.dress.dressrenting.model.ProductOffer;
-import com.dress.dressrenting.model.User;
+import com.dress.dressrenting.model.*;
 import com.dress.dressrenting.model.enums.*;
 import com.dress.dressrenting.repository.ProductOfferRepository;
 import com.dress.dressrenting.repository.ProductRepository;
@@ -40,6 +37,11 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public List<ProductResponseDto> getAll() {
         return productMapper.toDtoList(productRepository.findAll());
+    }
+
+    @Override
+    public List<ProductResponseDto> getPendingProducts() {
+        return productMapper.toDtoList(productRepository.findByProductStatus(ProductStatus.PENDING));
     }
 
     @Override
@@ -97,7 +99,7 @@ public class ProductServiceImpl implements ProductService {
                 .map(colorDto -> {
                     ColorAndSize colorAndSize = productMapper.toColorAndSize(colorDto);
 
-                    String colorKey = (colorDto.getColor().name() + "_" + colorDto.getSize()).toUpperCase();
+                    String colorKey = (colorDto.getColor().name() + "_" + String.join("-", colorDto.getSizes())).toUpperCase();
 
                     List<MultipartFile> files = colorImages.getOrDefault(colorKey, Collections.emptyList());
 
@@ -115,7 +117,7 @@ public class ProductServiceImpl implements ProductService {
                     colorAndSize.setPhotoCount(urls.size());
                     colorAndSize.setProduct(finalProduct);
 
-                    colorAndSize.setSize(colorDto.getSize());
+                    colorAndSize.setSizes(colorDto.getSizes());
 
                     return colorAndSize;
                 })
@@ -273,8 +275,8 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public List<ProductResponseDto> filter(Long subcategoryId, Color color, String size, Gender gender, BigDecimal minPrice, BigDecimal maxPrice) {
-        ProductFilterDto productFilterDto = new ProductFilterDto(subcategoryId, size, gender, color, minPrice, maxPrice);
+    public List<ProductResponseDto> filter(Long subcategoryId,Long categoryId,Color color, List<String> sizes, Gender gender, BigDecimal minPrice, BigDecimal maxPrice) {
+        ProductFilterDto productFilterDto = new ProductFilterDto(subcategoryId,categoryId,sizes, gender, color, minPrice, maxPrice);
         List<Product> filtered = productRepository.findAll(ProductSpecification.filter(productFilterDto));
         return productMapper.toDtoList(filtered);
     }

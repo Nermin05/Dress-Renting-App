@@ -13,6 +13,8 @@ import java.util.Map;
 public interface ProductService {
     List<ProductResponseDto> getAll();
 
+    List<ProductResponseDto> getPendingProducts();
+
     List<ProductResponseDto> getApprovedProducts();
 
     List<ProductResponseDto> getAllByOfferType(OfferType offerType, ProductCondition productCondition);
@@ -26,12 +28,7 @@ public interface ProductService {
 
     void delete(String productCode);
 
-    List<ProductResponseDto> filter(Long subcategoryId,
-                                    Color color,
-                                    String size,
-                                    Gender gender,
-                                    BigDecimal minPrice,
-                                    BigDecimal maxPrice);
+    List<ProductResponseDto> filter(Long subcategoryId,Long categoryId, Color color, List<String> sizes, Gender gender, BigDecimal minPrice, BigDecimal maxPrice);
 
     void changeStatus(String productCode, ProductStatus productStatus);
 

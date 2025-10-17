@@ -1,35 +1,49 @@
 package com.dress.dressrenting.service.impl;
 
 import com.dress.dressrenting.dto.request.SubCategoryRequestDto;
+import com.dress.dressrenting.exception.exceptions.NotFoundException;
+import com.dress.dressrenting.model.Category;
 import com.dress.dressrenting.model.SubCategory;
+import com.dress.dressrenting.repository.CategoryRepository;
 import com.dress.dressrenting.repository.SubCategoryRepository;
 import com.dress.dressrenting.service.SubCategoryService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class SubCategoryServiceImpl implements SubCategoryService {
 
     private final SubCategoryRepository repository;
+    private final CategoryRepository categoryRepository;
 
     @Override
     public SubCategory create(SubCategoryRequestDto subCategoryRequestDto) {
-        SubCategory subCategory=SubCategory.builder()
+        Category category = categoryRepository.findById(subCategoryRequestDto.categoryId()).orElseThrow(() -> {
+            log.error("Category not found with id: {}", subCategoryRequestDto.categoryId());
+            return new NotFoundException("Category not found with id: " + subCategoryRequestDto.categoryId());
+        });
+        SubCategory subCategory = SubCategory.builder()
                 .name(subCategoryRequestDto.name())
-                .categoryId(subCategoryRequestDto.categoryId())
+                .category(category)
                 .build();
         return repository.save(subCategory);
     }
 
     @Override
     public SubCategory update(Long id, SubCategoryRequestDto subCategory) {
+        Category category = categoryRepository.findById(subCategory.categoryId()).orElseThrow(() -> {
+            log.error("Category not found with id: {}", subCategory.categoryId());
+            return new NotFoundException("Category not found with id: " + subCategory.categoryId());
+        });
         SubCategory existing = repository.findById(id)
                 .orElseThrow(() -> new RuntimeException("SubCategory not found with id " + id));
         existing.setName(subCategory.name());
-        existing.setCategoryId(subCategory.categoryId());
+        existing.setCategory(category);
         return repository.save(existing);
     }
 

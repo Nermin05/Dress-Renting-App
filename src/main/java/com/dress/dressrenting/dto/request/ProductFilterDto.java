@@ -4,7 +4,8 @@ import com.dress.dressrenting.model.enums.Color;
 import com.dress.dressrenting.model.enums.Gender;
 
 import java.math.BigDecimal;
+import java.util.List;
 
-public record ProductFilterDto(Long subcategoryId, String size, Gender gender, Color color, BigDecimal minPrice,
+public record ProductFilterDto(Long subcategoryId,Long categoryId,List<String> sizes, Gender gender, Color color, BigDecimal minPrice,
                                BigDecimal maxPrice) {
 }

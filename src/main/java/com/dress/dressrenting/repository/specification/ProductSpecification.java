@@ -8,31 +8,37 @@ import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.Predicate;
 import org.springframework.data.jpa.domain.Specification;
 
-import java.util.Map;
-
 public class ProductSpecification {
 
     public static Specification<Product> filter(ProductFilterDto productFilterDto) {
         return (root, query, criteriaBuilder) -> {
             Predicate predicates = criteriaBuilder.conjunction();
 
-            predicates=criteriaBuilder.and(predicates,criteriaBuilder.equal(root.get("productStatus"), ProductStatus.ACTIVE));
+            predicates = criteriaBuilder.and(predicates, criteriaBuilder.equal(root.get("productStatus"), ProductStatus.ACTIVE));
 
             if (productFilterDto.subcategoryId() != null) {
-                predicates = criteriaBuilder.and(predicates, criteriaBuilder.equal(root.get("subcategoryId"), productFilterDto.subcategoryId()));
+                predicates = criteriaBuilder.and(predicates, criteriaBuilder.equal(root.get("subcategory").get("id"), productFilterDto.subcategoryId()));
             }
-            if (productFilterDto.gender() != null) {
-                predicates = criteriaBuilder.and(predicates, criteriaBuilder.equal(root.get("gender"), productFilterDto.gender()));
+
+            if (productFilterDto.categoryId() != null) {
+                predicates = criteriaBuilder.and(predicates, criteriaBuilder.equal(root.get("subcategory").get("category").get("id"), productFilterDto.categoryId()));
             }
-            if (productFilterDto.color() != null || productFilterDto.size() != null) {
+
+            if (productFilterDto.color() != null || productFilterDto.sizes() != null) {
                 Join<Product, ColorAndSize> colorAndSizes = root.join("colorAndSizes");
                 if (productFilterDto.color() != null) {
                     predicates = criteriaBuilder.and(predicates, criteriaBuilder.equal(colorAndSizes.get("color"), productFilterDto.color()));
                 }
-                if (productFilterDto.size() != null) {
-                    Join<ColorAndSize, Map.Entry<String, Long>> sizeEntryJoin = colorAndSizes.joinMap("sizeStockMap");
-                    predicates = criteriaBuilder.and(predicates, criteriaBuilder.equal(sizeEntryJoin, productFilterDto.size()));
+                if (productFilterDto.sizes() != null && !productFilterDto.sizes().isEmpty()) {
+                    Join<ColorAndSize, String> sizesJoin = colorAndSizes.join("sizes");
+                    predicates = criteriaBuilder.and(predicates, sizesJoin.in(productFilterDto.sizes()));
                 }
+            }
+
+
+
+            if (productFilterDto.gender() != null) {
+                predicates = criteriaBuilder.and(predicates, criteriaBuilder.equal(root.get("gender"), productFilterDto.gender()));
             }
             if (productFilterDto.minPrice() != null) {
                 predicates = criteriaBuilder.and(predicates, criteriaBuilder.greaterThanOrEqualTo(root.get("price"),

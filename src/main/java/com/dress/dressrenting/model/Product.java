@@ -27,7 +27,11 @@ public class Product {
     @ManyToOne
     @JoinColumn(name = "user_id")
     User user;
-    Long subcategoryId;
+
+    @ManyToOne
+    @JoinColumn(name = "subcategory_id")
+    SubCategory subcategory;
+
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference
     List<ColorAndSize> colorAndSizes;

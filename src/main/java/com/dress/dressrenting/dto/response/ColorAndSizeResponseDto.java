@@ -7,6 +7,6 @@ import java.util.List;
 @Data
 public class ColorAndSizeResponseDto {
     private String color;
-    private String size;
+    private List<String> sizes;
     private List<String> imageUrls;
 }

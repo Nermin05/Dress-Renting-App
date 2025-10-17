@@ -25,7 +25,10 @@ public class ColorAndSize {
 
     Integer photoCount;
 
-    String size;
+    @ElementCollection
+    @CollectionTable(name = "product_sizes", joinColumns = @JoinColumn(name = "color_size_id"))
+    @Column(name = "size")
+    List<String> sizes;
 
     @ElementCollection
     @CollectionTable(name = "product_images", joinColumns = @JoinColumn(name = "color_size_id"))

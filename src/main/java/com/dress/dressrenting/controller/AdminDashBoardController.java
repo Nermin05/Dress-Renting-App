@@ -23,7 +23,7 @@ public class AdminDashBoardController {
 
     @GetMapping("/all-products")
     public ResponseEntity<List<ProductResponseDto>> getAll() {
-        return ResponseEntity.ok(productService.getAll());
+        return ResponseEntity.ok(productService.getPendingProducts());
     }
 
     @PostMapping("/approve-product")

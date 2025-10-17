@@ -19,5 +19,7 @@ public class SubCategory {
     @Column(nullable = false, unique = true)
     String name;
 
-    Long categoryId;
+    @ManyToOne
+    @JoinColumn(name = "category_id")
+    Category category;
 }
