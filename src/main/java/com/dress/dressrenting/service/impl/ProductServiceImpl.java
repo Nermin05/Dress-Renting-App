@@ -99,7 +99,8 @@ public class ProductServiceImpl implements ProductService {
                 .map(colorDto -> {
                     ColorAndSize colorAndSize = productMapper.toColorAndSize(colorDto);
 
-                    String colorKey = (colorDto.getColor().name() + "_" + String.join("-", colorDto.getSizes())).toUpperCase();
+                    String colorKey = (colorDto.getColor().name() + "_" +
+                            String.join("_", colorDto.getSizes())).toUpperCase();
 
                     List<MultipartFile> files = colorImages.getOrDefault(colorKey, Collections.emptyList());
 

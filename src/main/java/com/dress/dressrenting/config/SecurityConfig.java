@@ -63,7 +63,8 @@ public class SecurityConfig {
                                 "/api/categories",
                                 "/api/categories/**",
                                 "/api/sub-categories",
-                                "/api/sub-categories/**"
+                                "/api/sub-categories/**",
+                                "api/v1/favorites/**"
                         ).permitAll()
                         .requestMatchers("/api/v1/admin-controller/**").hasAuthority("ADMIN")
                         .anyRequest().authenticated()
