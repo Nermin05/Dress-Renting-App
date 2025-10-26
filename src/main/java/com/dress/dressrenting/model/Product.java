@@ -6,6 +6,8 @@ import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 import java.math.BigDecimal;
 import java.time.Instant;
@@ -30,7 +32,9 @@ public class Product {
 
     @ManyToOne
     @JoinColumn(name = "subcategory_id")
+    @OnDelete(action = OnDeleteAction.CASCADE)
     SubCategory subcategory;
+
 
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference
