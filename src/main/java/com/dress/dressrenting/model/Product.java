@@ -21,31 +21,38 @@ import java.util.List;
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class Product {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long id;
+
     @Column(nullable = false, unique = true)
     String productCode;
+
     @ManyToOne
     @JoinColumn(name = "user_id")
     User user;
 
     @ManyToOne
-    @JoinColumn(name = "subcategory_id")
-    @OnDelete(action = OnDeleteAction.CASCADE)
+    @JoinColumn(name = "subcategory_id", nullable = true)
+    @OnDelete(action = OnDeleteAction.SET_NULL)
     SubCategory subcategory;
-
 
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference
     List<ColorAndSize> colorAndSizes;
+
     String description;
     BigDecimal price;
+
     @Enumerated(EnumType.STRING)
     Gender gender;
+
     @Enumerated(EnumType.STRING)
     ProductStatus productStatus;
+
     Instant createdAt;
+
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
     List<ProductOffer> productOffers;
 
@@ -58,6 +65,4 @@ public class Product {
             productCode = "TEMP-" + System.currentTimeMillis();
         }
     }
-
-
 }

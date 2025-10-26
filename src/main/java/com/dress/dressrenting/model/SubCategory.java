@@ -1,10 +1,14 @@
 package com.dress.dressrenting.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "sub_categories")
@@ -14,8 +18,9 @@ import org.hibernate.annotations.OnDeleteAction;
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class SubCategory {
+
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long id;
 
     @Column(nullable = false, unique = true)
@@ -25,4 +30,8 @@ public class SubCategory {
     @JoinColumn(name = "category_id")
     @OnDelete(action = OnDeleteAction.CASCADE)
     Category category;
+
+    @OneToMany(mappedBy = "subcategory")
+    @JsonIgnore
+    List<Product> products = new ArrayList<>();
 }
