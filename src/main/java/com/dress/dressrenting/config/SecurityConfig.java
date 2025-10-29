@@ -86,7 +86,7 @@ public class SecurityConfig {
         configuration.setAllowedOrigins(List.of(
                 "http://localhost:5173",
                 "http://localhost:8081",
-                "http://109.123.252.254",
+                "http://38.242.147.61",
                 "https://weshare.az",
                 "https://www.weshare.az"
         ));
