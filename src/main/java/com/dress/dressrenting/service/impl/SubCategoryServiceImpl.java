@@ -30,6 +30,7 @@ public class SubCategoryServiceImpl implements SubCategoryService {
         SubCategory subCategory = SubCategory.builder()
                 .name(subCategoryRequestDto.name())
                 .category(category)
+                .gender(subCategoryRequestDto.gender())
                 .build();
         return repository.save(subCategory);
     }
@@ -44,6 +45,7 @@ public class SubCategoryServiceImpl implements SubCategoryService {
                 .orElseThrow(() -> new RuntimeException("SubCategory not found with id " + id));
         existing.setName(subCategory.name());
         existing.setCategory(category);
+        existing.setGender(subCategory.gender());
         return repository.save(existing);
     }
 

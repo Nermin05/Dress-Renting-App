@@ -27,7 +27,7 @@ public interface ProductMapper {
     @Mapping(target = "userPhone", source = "user.phone")
     @Mapping(target = "subcategory", source = "subcategory")
     @Mapping(target = "description", source = "description")
-    @Mapping(target = "gender", expression = "java(product.getGender())")
+    @Mapping(target = "gender", expression = "java(product.getSubcategory().getGender())")
     @Mapping(target = "colorAndSizes", expression = "java(mapColorAndSizes(product.getColorAndSizes()))")
     @Mapping(target = "offers", source = "productOffers")
     ProductResponseDto toDto(Product product);

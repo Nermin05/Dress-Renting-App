@@ -1,6 +1,5 @@
 package com.dress.dressrenting.model;
 
-import com.dress.dressrenting.model.enums.Gender;
 import com.dress.dressrenting.model.enums.ProductStatus;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
@@ -44,9 +43,6 @@ public class Product {
 
     String description;
     BigDecimal price;
-
-    @Enumerated(EnumType.STRING)
-    Gender gender;
 
     @Enumerated(EnumType.STRING)
     ProductStatus productStatus;

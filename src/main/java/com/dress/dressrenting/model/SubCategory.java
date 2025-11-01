@@ -1,5 +1,6 @@
 package com.dress.dressrenting.model;
 
+import com.dress.dressrenting.model.enums.Gender;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
@@ -30,6 +31,10 @@ public class SubCategory {
     @JoinColumn(name = "category_id")
     @OnDelete(action = OnDeleteAction.CASCADE)
     Category category;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    Gender gender;
 
     @OneToMany(mappedBy = "subcategory")
     @JsonIgnore
