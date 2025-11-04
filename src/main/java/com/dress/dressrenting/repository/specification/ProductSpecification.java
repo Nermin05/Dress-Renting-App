@@ -34,11 +34,14 @@ public class ProductSpecification {
                     predicates = criteriaBuilder.and(predicates, sizesJoin.in(productFilterDto.sizes()));
                 }
             }
-
-
-
             if (productFilterDto.gender() != null) {
-                predicates = criteriaBuilder.and(predicates, criteriaBuilder.equal(root.get("gender"), productFilterDto.gender()));
+                predicates = criteriaBuilder.and(
+                        predicates,
+                        criteriaBuilder.equal(
+                                root.get("subcategory").get("gender"),
+                                productFilterDto.gender()
+                        )
+                );
             }
             if (productFilterDto.minPrice() != null) {
                 predicates = criteriaBuilder.and(predicates, criteriaBuilder.greaterThanOrEqualTo(root.get("price"),
