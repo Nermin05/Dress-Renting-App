@@ -10,6 +10,7 @@ import com.dress.dressrenting.model.*;
 import com.dress.dressrenting.model.enums.*;
 import com.dress.dressrenting.repository.ProductOfferRepository;
 import com.dress.dressrenting.repository.ProductRepository;
+import com.dress.dressrenting.repository.SubCategoryRepository;
 import com.dress.dressrenting.repository.UserRepository;
 import com.dress.dressrenting.repository.specification.ProductSpecification;
 import com.dress.dressrenting.service.ProductService;
@@ -33,6 +34,7 @@ public class ProductServiceImpl implements ProductService {
     private final ProductMapper productMapper;
     private final ProductOfferRepository productOfferRepository;
     private final UserRepository userRepository;
+    private final SubCategoryRepository subCategoryRepository;
 
     @Override
     public List<ProductResponseDto> getAll() {
@@ -90,6 +92,12 @@ public class ProductServiceImpl implements ProductService {
 
         product.setUser(user);
         product = productRepository.save(product);
+
+        if (productRequestDto.getSubcategoryId() != null) {
+            SubCategory sub = subCategoryRepository.findById(productRequestDto.getSubcategoryId())
+                    .orElseThrow(() -> new NotFoundException("Subcategory not found"));
+            product.setSubcategory(sub);
+        }
 
         Product finalProduct = product;
 
@@ -276,8 +284,8 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public List<ProductResponseDto> filter(Long subcategoryId,Long categoryId,Color color, List<String> sizes, Gender gender, BigDecimal minPrice, BigDecimal maxPrice) {
-        ProductFilterDto productFilterDto = new ProductFilterDto(subcategoryId,categoryId,sizes, gender, color, minPrice, maxPrice);
+    public List<ProductResponseDto> filter(Long subcategoryId, Long categoryId, Color color, List<String> sizes, Gender gender, BigDecimal minPrice, BigDecimal maxPrice) {
+        ProductFilterDto productFilterDto = new ProductFilterDto(subcategoryId, categoryId, sizes, gender, color, minPrice, maxPrice);
         List<Product> filtered = productRepository.findAll(ProductSpecification.filter(productFilterDto));
         return productMapper.toDtoList(filtered);
     }
