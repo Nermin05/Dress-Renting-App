@@ -4,5 +4,7 @@ import com.dress.dressrenting.model.enums.Gender;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
-public record SubCategoryRequestDto(@NotBlank String name, @NotNull Long categoryId, Gender gender) {
+import java.util.List;
+
+public record SubCategoryRequestDto(@NotBlank String name, @NotNull Long categoryId, List<Gender> genders) {
 }

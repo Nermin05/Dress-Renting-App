@@ -16,7 +16,7 @@ public record ProductResponseDto(
         String productCode,
         SubCategory subcategory,
         BigDecimal price,
-        Gender gender,
+        List<Gender> genders,
         String description,
         Long userId,
         List<ColorAndSizeResponseDto> colorAndSizes,

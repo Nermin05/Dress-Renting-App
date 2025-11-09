@@ -8,7 +8,7 @@ import java.util.List;
 
 
 public record UpdatedProductRequestDto(Color color,
-                                       BigDecimal price, Gender gender,
+                                       BigDecimal price, List<Gender> genders,
                                        List<String> keptImageUrls,
                                        List<ProductOfferRequestDto> productOffers) {
 }

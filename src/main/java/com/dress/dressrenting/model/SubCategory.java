@@ -34,7 +34,7 @@ public class SubCategory {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    Gender gender;
+    List<Gender> genders;
 
     @OneToMany(mappedBy = "subcategory")
     @JsonIgnore

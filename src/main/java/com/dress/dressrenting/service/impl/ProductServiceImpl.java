@@ -201,7 +201,7 @@ public class ProductServiceImpl implements ProductService {
                 .orElseThrow(() -> new NotFoundException("Product not found with id: " + productCode));
 
         product.setPrice(requestDto.price());
-        product.getSubcategory().setGender(requestDto.gender());
+        product.getSubcategory().setGenders(requestDto.genders());
 
         List<ColorAndSize> updatedColorAndSizes = product.getColorAndSizes().stream()
                 .peek(cs -> {

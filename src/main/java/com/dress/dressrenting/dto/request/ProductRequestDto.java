@@ -26,7 +26,7 @@ public class ProductRequestDto {
     private String userPhone;
     private Long subcategoryId;
     private List<ColorAndSizeRequestDto> colorAndSizes;
-    private Gender gender;
+    private List<Gender> genders;
     private List<ProductOfferRequestDto> productOffers;
 }
 
