@@ -1,6 +1,9 @@
 package com.dress.dressrenting.dto.request;
 
+import com.dress.dressrenting.model.enums.Gender;
 import jakarta.validation.constraints.NotBlank;
 
-public record CategoryRequestDto(@NotBlank String name) {
+import java.util.List;
+
+public record CategoryRequestDto(@NotBlank String name, List<Gender> genders) {
 }

@@ -4,9 +4,9 @@ import com.dress.dressrenting.dto.request.ColorAndSizeRequestDto;
 import com.dress.dressrenting.dto.request.ProductRequestDto;
 import com.dress.dressrenting.dto.response.ColorAndSizeResponseDto;
 import com.dress.dressrenting.dto.response.ProductResponseDto;
+import com.dress.dressrenting.model.Category;
 import com.dress.dressrenting.model.ColorAndSize;
 import com.dress.dressrenting.model.Product;
-import com.dress.dressrenting.model.SubCategory;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
@@ -17,7 +17,7 @@ import java.util.stream.Collectors;
 public interface ProductMapper {
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
-    @Mapping(target = "subcategory", expression = "java(mapSubCategory(productRequestDto.getSubcategoryId()))")
+    @Mapping(target = "category", expression = "java(mapCategory(productRequestDto.getCategoryId()))")
     Product toEntity(ProductRequestDto productRequestDto);
 
     @Mapping(target = "productCode", source = "productCode")
@@ -25,9 +25,9 @@ public interface ProductMapper {
     @Mapping(target = "userSurname", source = "user.surname")
     @Mapping(target = "userEmail", source = "user.email")
     @Mapping(target = "userPhone", source = "user.phone")
-    @Mapping(target = "subcategory", source = "subcategory")
+    @Mapping(target = "category", source = "category")
     @Mapping(target = "description", source = "description")
-    @Mapping(target = "genders", expression = "java(product.getSubcategory().getGenders())")
+    @Mapping(target = "genders", expression = "java(product.getCategory().getGenders())")
     @Mapping(target = "colorAndSizes", expression = "java(mapColorAndSizes(product.getColorAndSizes()))")
     @Mapping(target = "offers", source = "productOffers")
     ProductResponseDto toDto(Product product);
@@ -52,11 +52,11 @@ public interface ProductMapper {
 
     List<ColorAndSize> toColorAndSizeList(List<ColorAndSizeRequestDto> dtos);
 
-    default SubCategory mapSubCategory(Long subCategoryId) {
-        if (subCategoryId == null) return null;
-        SubCategory subCategory = new SubCategory();
-        subCategory.setId(subCategoryId);
-        return subCategory;
+    default Category mapCategory(Long categoryId) {
+        if (categoryId == null) return null;
+        Category category = new Category();
+        category.setId(categoryId);
+        return category;
     }
 }
 

@@ -16,9 +16,6 @@ public class ProductSpecification {
 
             predicates = criteriaBuilder.and(predicates, criteriaBuilder.equal(root.get("productStatus"), ProductStatus.ACTIVE));
 
-            if (productFilterDto.subcategoryId() != null) {
-                predicates = criteriaBuilder.and(predicates, criteriaBuilder.equal(root.get("subcategory").get("id"), productFilterDto.subcategoryId()));
-            }
 
             if (productFilterDto.categoryId() != null) {
                 predicates = criteriaBuilder.and(predicates, criteriaBuilder.equal(root.get("subcategory").get("category").get("id"), productFilterDto.categoryId()));

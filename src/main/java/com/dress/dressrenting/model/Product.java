@@ -1,6 +1,7 @@
 package com.dress.dressrenting.model;
 
 import com.dress.dressrenting.model.enums.ProductStatus;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
@@ -19,6 +20,7 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
+@JsonIgnoreProperties({"hibernateLazyInitializer","handler"})
 public class Product {
 
     @Id
@@ -28,14 +30,14 @@ public class Product {
     @Column(nullable = false, unique = true)
     String productCode;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     User user;
 
-    @ManyToOne
-    @JoinColumn(name = "subcategory_id", nullable = true)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "category_id", nullable = true)
     @OnDelete(action = OnDeleteAction.SET_NULL)
-    SubCategory subcategory;
+    Category category;
 
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference
@@ -55,10 +57,7 @@ public class Product {
     @PrePersist
     void prePersist() {
         createdAt = Instant.now();
-        productStatus = ProductStatus.PENDING;
-
-        if (productCode == null) {
-            productCode = "TEMP-" + System.currentTimeMillis();
-        }
+        if (productStatus == null) productStatus = ProductStatus.PENDING;
+        if (productCode == null) productCode = "TEMP-" + System.currentTimeMillis();
     }
 }

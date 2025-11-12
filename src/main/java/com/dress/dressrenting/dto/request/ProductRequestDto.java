@@ -24,7 +24,7 @@ public class ProductRequestDto {
             regexp = "^(\\+994|0)(50|51|55|70|77|99)\\d{7}$"
     )
     private String userPhone;
-    private Long subcategoryId;
+    private Long categoryId;
     private List<ColorAndSizeRequestDto> colorAndSizes;
     private List<Gender> genders;
     private List<ProductOfferRequestDto> productOffers;

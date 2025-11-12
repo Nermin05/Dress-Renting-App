@@ -6,6 +6,6 @@ import com.dress.dressrenting.model.enums.Gender;
 import java.math.BigDecimal;
 import java.util.List;
 
-public record ProductFilterDto(Long subcategoryId,Long categoryId,List<String> sizes, Gender gender, Color color, BigDecimal minPrice,
+public record ProductFilterDto(Long categoryId,List<String> sizes, Gender gender, Color color, BigDecimal minPrice,
                                BigDecimal maxPrice) {
 }
