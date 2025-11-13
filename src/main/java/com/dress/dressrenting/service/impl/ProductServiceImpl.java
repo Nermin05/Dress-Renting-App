@@ -152,18 +152,7 @@ public class ProductServiceImpl implements ProductService {
                     if (dto.offerType() == OfferType.RENT && dto.rentDuration() == null) {
                         throw new IllegalArgumentException("Rent offer must have rentDuration!");
                     }
-
-                    BigDecimal totalPrice = dto.offerType() == OfferType.RENT
-                            ? dto.price().multiply(BigDecimal.valueOf(dto.rentDuration()))
-                            : dto.price();
-
-                    if (dto.offerType() == OfferType.SALE && dto.condition() == null) {
-                        throw new IllegalArgumentException("SALE offers must have condition: FIRST_HAND or SECOND_HAND");
-                    }
-
-                    if (dto.offerType() == OfferType.SALE && dto.condition() == ProductCondition.SECOND_HAND) {
-                        totalPrice = totalPrice.multiply(BigDecimal.valueOf(0.8));
-                    }
+                    BigDecimal totalPrice = dto.price();
 
                     return ProductOffer.builder()
                             .product(finalProduct1)
