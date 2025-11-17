@@ -38,6 +38,7 @@ public class Category {
     @OneToMany(mappedBy = "category", cascade = CascadeType.ALL, orphanRemoval = false)
     @JsonIgnore
     List<Product> products = new ArrayList<>();
+
 //    @OneToMany(mappedBy = "category", cascade = CascadeType.ALL, orphanRemoval = true)
 //    @JsonIgnore
 //    List<SubCategory> subCategories = new ArrayList<>();

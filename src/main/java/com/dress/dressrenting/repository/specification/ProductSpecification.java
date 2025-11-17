@@ -1,8 +1,10 @@
 package com.dress.dressrenting.repository.specification;
 
 import com.dress.dressrenting.dto.request.ProductFilterDto;
+import com.dress.dressrenting.model.Category;
 import com.dress.dressrenting.model.ColorAndSize;
 import com.dress.dressrenting.model.Product;
+import com.dress.dressrenting.model.enums.Gender;
 import com.dress.dressrenting.model.enums.ProductStatus;
 import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.Predicate;
@@ -32,12 +34,10 @@ public class ProductSpecification {
                 }
             }
             if (productFilterDto.gender() != null) {
+                Join<Product, Category> categoryJoin = root.join("category");
+                Join<Category, Gender> genderJoin = categoryJoin.join("genders");
                 predicates = criteriaBuilder.and(
-                        predicates,
-                        criteriaBuilder.equal(
-                                root.get("subcategory").get("gender"),
-                                productFilterDto.gender()
-                        )
+                        predicates, criteriaBuilder.equal(genderJoin, productFilterDto.gender())
                 );
             }
             if (productFilterDto.minPrice() != null) {
