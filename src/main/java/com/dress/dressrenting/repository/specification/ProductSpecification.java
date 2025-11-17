@@ -20,7 +20,7 @@ public class ProductSpecification {
 
 
             if (productFilterDto.categoryId() != null) {
-                predicates = criteriaBuilder.and(predicates, criteriaBuilder.equal(root.get("subcategory").get("category").get("id"), productFilterDto.categoryId()));
+                predicates = criteriaBuilder.and(predicates, criteriaBuilder.equal(root.get("category").get("id"), productFilterDto.categoryId()));
             }
 
             if (productFilterDto.color() != null || productFilterDto.sizes() != null) {
