@@ -83,13 +83,17 @@ public class ProductServiceImpl implements ProductService {
 
         Product product = productMapper.toEntity(productRequestDto);
 
-        User user = new User();
-        user.setName(productRequestDto.getUserName());
-        user.setSurname(productRequestDto.getUserSurname());
-        user.setEmail(productRequestDto.getUserEmail());
-        user.setPhone(productRequestDto.getUserPhone());
-        user.setUserRole(UserRole.USER);
-        user = userRepository.save(user);
+        User user = userRepository
+                .findByEmail(productRequestDto.getUserEmail())
+                .orElseGet(() -> {
+                    User newUser = new User();
+                    newUser.setName(productRequestDto.getUserName());
+                    newUser.setSurname(productRequestDto.getUserSurname());
+                    newUser.setEmail(productRequestDto.getUserEmail());
+                    newUser.setPhone(productRequestDto.getUserPhone());
+                    newUser.setUserRole(UserRole.USER);
+                    return userRepository.save(newUser);
+                });
 
         product.setUser(user);
         product = productRepository.save(product);
