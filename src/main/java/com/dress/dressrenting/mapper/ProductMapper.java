@@ -2,11 +2,14 @@ package com.dress.dressrenting.mapper;
 
 import com.dress.dressrenting.dto.request.ColorAndSizeRequestDto;
 import com.dress.dressrenting.dto.request.ProductRequestDto;
+import com.dress.dressrenting.dto.response.CategoryResponseDto;
 import com.dress.dressrenting.dto.response.ColorAndSizeResponseDto;
+import com.dress.dressrenting.dto.response.ProductOfferResponseDto;
 import com.dress.dressrenting.dto.response.ProductResponseDto;
 import com.dress.dressrenting.model.Category;
 import com.dress.dressrenting.model.ColorAndSize;
 import com.dress.dressrenting.model.Product;
+import com.dress.dressrenting.model.ProductOffer;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
@@ -58,6 +61,24 @@ public interface ProductMapper {
         category.setId(categoryId);
         return category;
     }
+    default List<ProductOfferResponseDto> mapOffers(List<ProductOffer> list) {
+        if (list == null) return List.of();
+        return list.stream()
+                .map(o -> new ProductOfferResponseDto(
+                        o.getId(),
+                        o.getOfferType().name(),
+                        o.getPrice(),
+                        o.getProductCondition().name(),
+                        o.getRentDuration()
+                ))
+                .toList();
+    }
+    default CategoryResponseDto mapCategoryToDto(Category category) {
+        if (category == null) return null;
+        return new CategoryResponseDto(category.getId(), category.getName());
+    }
+
+
 }
 
 //    default User mapUser(Long userId) {
