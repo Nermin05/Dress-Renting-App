@@ -299,7 +299,7 @@ public class ProductServiceImpl implements ProductService {
         emailService.sendEmail(
                 product.getUser().getEmail(),
                 "Your product was approved",
-                "Congratulations! Your product '" + product.getCategory() + "' was approved"
+                "Congratulations! Your product '" + product.getCategory().getName() + "' was approved"
         );
         return productMapper.toDtoList(productRepository.findByProductStatus(ProductStatus.ACTIVE));
     }
@@ -312,7 +312,7 @@ public class ProductServiceImpl implements ProductService {
         emailService.sendEmail(
                 product.getUser().getEmail(),
                 "Your product was rejected",
-                "Unfortunately your product '" + product.getCategory()+"' was rejected"
+                "Unfortunately your product '" + product.getCategory().getName()+"' was rejected"
         );
         return productMapper.toDtoList(productRepository.findByProductStatus(ProductStatus.ACTIVE));
     }
