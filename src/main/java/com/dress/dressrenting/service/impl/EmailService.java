@@ -3,7 +3,6 @@ package com.dress.dressrenting.service.impl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -12,15 +11,16 @@ public class EmailService {
 
     private final JavaMailSender mailSender;
 
-    @Async
-    public void sendEmail(String to, String subject, String body) {
+    public void sendEmail(String to, String subject, String text) {
         SimpleMailMessage message = new SimpleMailMessage();
-
+        String from = "z3kkadamirli@gmail.com";
+        message.setFrom(from);
         message.setTo(to);
         message.setSubject(subject);
-        message.setText(body);
+        message.setText(text);
 
         mailSender.send(message);
     }
 }
+
 
