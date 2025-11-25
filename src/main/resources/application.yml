@@ -29,7 +29,7 @@ spring:
             enable: false
     default-encoding: UTF-8
 server:
-  port: 8081
+  port: 8085
 
 cloudinary:
   cloud:
