@@ -35,6 +35,7 @@ public class ProductServiceImpl implements ProductService {
     private final ProductOfferRepository productOfferRepository;
     private final UserRepository userRepository;
     private final CategoryRepository categoryRepository;
+    private final EmailService emailService;
 
     @Override
     public List<ProductResponseDto> getAll() {
@@ -291,6 +292,11 @@ public class ProductServiceImpl implements ProductService {
         Product product = findByProductCode(productCode);
         product.setProductStatus(ProductStatus.ACTIVE);
         productRepository.save(product);
+        emailService.sendEmail(
+                product.getUser().getEmail(),
+                "Your product was approved",
+                "Congratulations! Your product '" + product.getCategory() + "' was approved"
+        );
         return productMapper.toDtoList(productRepository.findByProductStatus(ProductStatus.ACTIVE));
     }
 
@@ -299,6 +305,11 @@ public class ProductServiceImpl implements ProductService {
         Product product = findByProductCode(productCode);
         product.setProductStatus(ProductStatus.DELETED);
         productRepository.save(product);
+        emailService.sendEmail(
+                product.getUser().getEmail(),
+                "Your product was rejected",
+                "Unfortunately your product '" + product.getCategory()+"' was rejected"
+        );
         return productMapper.toDtoList(productRepository.findByProductStatus(ProductStatus.ACTIVE));
     }
 
