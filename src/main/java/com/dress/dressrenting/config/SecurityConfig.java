@@ -88,7 +88,9 @@ public class SecurityConfig {
                 "http://localhost:8081",
                 "http://38.242.147.61",
                 "https://weshare.az",
-                "https://www.weshare.az"
+                "https://www.weshare.az",
+                "https://test.weshare.az",
+                "https://www.test.weshare.az"
         ));
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("*"));
