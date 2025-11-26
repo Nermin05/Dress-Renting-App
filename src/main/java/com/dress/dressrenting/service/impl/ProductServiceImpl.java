@@ -296,25 +296,51 @@ public class ProductServiceImpl implements ProductService {
         Product product = findByProductCode(productCode);
         product.setProductStatus(ProductStatus.ACTIVE);
         productRepository.save(product);
-        emailService.sendEmail(
-                product.getUser().getEmail(),
-                "Your product was approved",
-                "Congratulations! Your product '" + product.getCategory().getName() + "' was approved"
-        );
+        StringBuilder body = new StringBuilder();
+
+        body.append("Dəyərli müştəri, ")
+                .append("</a><br><br>")
+                .append(productCode)
+                .append(" nömrəli məhsulunuz təsdiq olunmuşdur.<br>")
+                .append("Sizə xidmət etməkdən məmnunluq duyuruq.<br>")
+                .append("Məhsula baxmaq üçün link: ")
+                .append("<a href=\"https://test.weshare.az/")
+                .append(productCode)
+                .append("\">https://test.weshare.az/")
+                .append(productCode)
+                .append("</a><br><br>")
+                .append("Bizimlə əlaqə saxlamaq üçün aşağıdakı nömrəyə zəng edə bilərsiniz:<br>")
+                .append("<a href=\"tel:+994993626260\">+994 993 62 62 60</a><br><br>")
+                .append("Hörmətlə,<br>")
+                .append("WeShare");
+
+        emailService.sendEmail(product.getUser().getEmail(), "Məhsul statusu haqqında bildiriş", body.toString());
         return productMapper.toDtoList(productRepository.findByProductStatus(ProductStatus.ACTIVE));
     }
 
     @Override
-    public List<ProductResponseDto> disapproveProduct(String productCode) {
+    public ProductResponseDto disapproveProduct(String productCode) {
         Product product = findByProductCode(productCode);
         product.setProductStatus(ProductStatus.DELETED);
         productRepository.save(product);
+        StringBuilder body = new StringBuilder();
+
+        body.append("Dəyərli müştəri, ")
+                .append("</a><br><br>")
+                .append(productCode)
+                .append(" nömrəli məhsulunuz təəssüf ki, təsdiq edilməmişdir.<br>")
+                .append("Zəhmət olmasa məlumatları yenidən yoxlayıb təkrar göndərməyiniz xahiş olunur.")
+                .append("</a><br><br>")
+                .append("Hər hansı sualınız olarsa, bizimlə əlaqə saxlaya bilərsiniz:<br>")
+                .append("<a href=\"tel:+994993626260\">+994 993 62 62 60</a><br><br>")
+                .append("Hörmətlə,<br>")
+                .append("WeShare");
+
         emailService.sendEmail(
                 product.getUser().getEmail(),
-                "Your product was rejected",
-                "Unfortunately your product '" + product.getCategory().getName()+"' was rejected"
+                "Məhsul statusu haqqında bildiriş", body.toString()
         );
-        return productMapper.toDtoList(productRepository.findByProductStatus(ProductStatus.ACTIVE));
+        return productMapper.toDto(product);
     }
 
     private Product findByProductCode(String productCode) {
