@@ -25,6 +25,7 @@ public interface ProductMapper {
 
     @Mapping(target = "productCode", source = "productCode")
     @Mapping(target = "userName", source = "user.name")
+    @Mapping(target = "userId", source = "user.id")
     @Mapping(target = "userSurname", source = "user.surname")
     @Mapping(target = "userEmail", source = "user.email")
     @Mapping(target = "userPhone", source = "user.phone")
