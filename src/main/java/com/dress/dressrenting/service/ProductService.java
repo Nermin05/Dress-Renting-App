@@ -34,5 +34,5 @@ public interface ProductService {
 
     List<ProductResponseDto> approveProduct(String productCode);
 
-    List<ProductResponseDto> disapproveProduct(String productCode);
+    ProductResponseDto disapproveProduct(String productCode);
 }
