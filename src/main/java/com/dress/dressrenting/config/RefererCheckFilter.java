@@ -22,7 +22,7 @@ public class RefererCheckFilter extends OncePerRequestFilter {
 
         String path = request.getRequestURI();
 
-        if (path.startsWith("/api/v1/products") || path.startsWith("/api/categories")) {
+        if (path.startsWith("/api")) {
 
             String referer = request.getHeader("Referer");
             String origin = request.getHeader("Origin");
