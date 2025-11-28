@@ -32,7 +32,7 @@ public class AdminDashBoardController {
     }
 
     @PostMapping("/disapprove-product")
-    public ResponseEntity<List<ProductResponseDto>> disapproveProduct(String productCode) {
+    public ResponseEntity<ProductResponseDto> disapproveProduct(String productCode) {
         return ResponseEntity.ok(productService.disapproveProduct(productCode));
     }
 }

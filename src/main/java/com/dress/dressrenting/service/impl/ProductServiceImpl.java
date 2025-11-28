@@ -35,6 +35,7 @@ public class ProductServiceImpl implements ProductService {
     private final ProductOfferRepository productOfferRepository;
     private final UserRepository userRepository;
     private final CategoryRepository categoryRepository;
+    private final EmailService emailService;
 
     @Override
     public List<ProductResponseDto> getAll() {
@@ -82,13 +83,17 @@ public class ProductServiceImpl implements ProductService {
 
         Product product = productMapper.toEntity(productRequestDto);
 
-        User user = new User();
-        user.setName(productRequestDto.getUserName());
-        user.setSurname(productRequestDto.getUserSurname());
-        user.setEmail(productRequestDto.getUserEmail());
-        user.setPhone(productRequestDto.getUserPhone());
-        user.setUserRole(UserRole.USER);
-        user = userRepository.save(user);
+        User user = userRepository
+                .findByEmail(productRequestDto.getUserEmail())
+                .orElseGet(() -> {
+                    User newUser = new User();
+                    newUser.setName(productRequestDto.getUserName());
+                    newUser.setSurname(productRequestDto.getUserSurname());
+                    newUser.setEmail(productRequestDto.getUserEmail());
+                    newUser.setPhone(productRequestDto.getUserPhone());
+                    newUser.setUserRole(UserRole.USER);
+                    return userRepository.save(newUser);
+                });
 
         product.setUser(user);
         product = productRepository.save(product);
@@ -291,15 +296,51 @@ public class ProductServiceImpl implements ProductService {
         Product product = findByProductCode(productCode);
         product.setProductStatus(ProductStatus.ACTIVE);
         productRepository.save(product);
+        StringBuilder body = new StringBuilder();
+
+        body.append("Dəyərli müştəri, ")
+                .append("</a><br><br>")
+                .append(productCode)
+                .append(" nömrəli məhsulunuz təsdiq olunmuşdur.<br>")
+                .append("Sizə xidmət etməkdən məmnunluq duyuruq.<br>")
+                .append("Məhsula baxmaq üçün link: ")
+                .append("<a href=\"https://test.weshare.az/")
+                .append(productCode)
+                .append("\">https://test.weshare.az/")
+                .append(productCode)
+                .append("</a><br><br>")
+                .append("Bizimlə əlaqə saxlamaq üçün aşağıdakı nömrəyə zəng edə bilərsiniz:<br>")
+                .append("<a href=\"tel:+994993626260\">+994 993 62 62 60</a><br><br>")
+                .append("Hörmətlə,<br>")
+                .append("WeShare");
+
+        emailService.sendEmail(product.getUser().getEmail(), "Məhsul statusu haqqında bildiriş", body.toString());
         return productMapper.toDtoList(productRepository.findByProductStatus(ProductStatus.ACTIVE));
     }
 
     @Override
-    public List<ProductResponseDto> disapproveProduct(String productCode) {
+    public ProductResponseDto disapproveProduct(String productCode) {
         Product product = findByProductCode(productCode);
         product.setProductStatus(ProductStatus.DELETED);
         productRepository.save(product);
-        return productMapper.toDtoList(productRepository.findByProductStatus(ProductStatus.ACTIVE));
+        StringBuilder body = new StringBuilder();
+
+        body.append("Dəyərli müştəri, ")
+                .append("</a><br><br>")
+                .append(productCode)
+                .append(" nömrəli məhsulunuz təəssüf ki, təsdiq edilməmişdir.<br>")
+                .append("Zəhmət olmasa məlumatları yenidən yoxlayıb təkrar göndərməyiniz xahiş olunur.")
+                .append("</a><br><br>")
+                .append("Hər hansı sualınız olarsa, bizimlə əlaqə saxlaya bilərsiniz:<br>")
+                .append("<a href=\"tel:+994993626260\">+994 993 62 62 60</a><br><br>")
+                .append("Hörmətlə,<br>")
+                .append("WeShare");
+
+        emailService.sendEmail(
+                product.getUser().getEmail(),
+                "Məhsul statusu haqqında bildiriş", body.toString()
+        );
+        return productMapper.toDto(product);
     }
 
     private Product findByProductCode(String productCode) {
