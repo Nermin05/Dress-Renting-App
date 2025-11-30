@@ -8,9 +8,9 @@ import com.dress.dressrenting.exception.exceptions.NotFoundException;
 import com.dress.dressrenting.mapper.ProductMapper;
 import com.dress.dressrenting.model.*;
 import com.dress.dressrenting.model.enums.*;
-import com.dress.dressrenting.repository.CategoryRepository;
 import com.dress.dressrenting.repository.ProductOfferRepository;
 import com.dress.dressrenting.repository.ProductRepository;
+import com.dress.dressrenting.repository.SubCategoryRepository;
 import com.dress.dressrenting.repository.UserRepository;
 import com.dress.dressrenting.repository.specification.ProductSpecification;
 import com.dress.dressrenting.service.ProductService;
@@ -34,7 +34,7 @@ public class ProductServiceImpl implements ProductService {
     private final ProductMapper productMapper;
     private final ProductOfferRepository productOfferRepository;
     private final UserRepository userRepository;
-    private final CategoryRepository categoryRepository;
+    private final SubCategoryRepository subCategoryRepository;
     private final EmailService emailService;
 
     @Override
@@ -98,11 +98,11 @@ public class ProductServiceImpl implements ProductService {
         product.setUser(user);
         product = productRepository.save(product);
 
-        if (productRequestDto.getCategoryId() != null) {
-            Category category = categoryRepository.findById(productRequestDto.getCategoryId())
-                    .orElseThrow(() -> new NotFoundException("Category not found"));
-            product.setCategory(category);
-            product.getCategory().setGenders(productRequestDto.getGenders());
+        if (productRequestDto.getSubCategoryId() != null) {
+            SubCategory subCategory = subCategoryRepository.findById(productRequestDto.getSubCategoryId())
+                    .orElseThrow(() -> new NotFoundException("Subcategory not found"));
+            product.setSubCategory(subCategory);
+            product.getSubCategory().setGenders(productRequestDto.getGenders());
         }
 
         Product finalProduct = product;

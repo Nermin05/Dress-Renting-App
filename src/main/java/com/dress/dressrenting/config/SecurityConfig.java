@@ -60,8 +60,10 @@ public class SecurityConfig {
                                 "/api/v1/products",
                                 "/api/v1/products/**",
                                 "/api/v1/products/filter",
-                                "/api/categories/**"
-                        ).permitAll()
+                                "/api/v1/categories/**",
+                                "/api/v1/sub-categories/**",
+                                "/api/v1/brands/**"
+                                ).permitAll()
                         .requestMatchers("/api/v1/admin-controller/**").hasAuthority("ADMIN")
                         .anyRequest().authenticated()
                 )
@@ -72,7 +74,7 @@ public class SecurityConfig {
                 .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authenticationProvider(customAuthenticationProvider)
 
-                .addFilterBefore(new RefererCheckFilter(), UsernamePasswordAuthenticationFilter.class)
+             //   .addFilterBefore(new RefererCheckFilter(), UsernamePasswordAuthenticationFilter.class)
 
                 .addFilterBefore(jwtFilter(), UsernamePasswordAuthenticationFilter.class);
 

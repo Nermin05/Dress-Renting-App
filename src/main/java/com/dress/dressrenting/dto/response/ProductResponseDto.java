@@ -1,5 +1,7 @@
 package com.dress.dressrenting.dto.response;
 
+import com.dress.dressrenting.model.Brand;
+import com.dress.dressrenting.model.SubCategory;
 import com.dress.dressrenting.model.enums.Gender;
 
 import java.math.BigDecimal;
@@ -12,7 +14,8 @@ public record ProductResponseDto(
         String userEmail,
         String userPhone,
         String productCode,
-        CategoryResponseDto category,
+        SubCategory subCategory,
+        Brand brand,
         BigDecimal price,
         List<Gender> genders,
         String description,

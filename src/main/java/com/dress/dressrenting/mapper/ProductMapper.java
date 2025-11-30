@@ -6,10 +6,7 @@ import com.dress.dressrenting.dto.response.CategoryResponseDto;
 import com.dress.dressrenting.dto.response.ColorAndSizeResponseDto;
 import com.dress.dressrenting.dto.response.ProductOfferResponseDto;
 import com.dress.dressrenting.dto.response.ProductResponseDto;
-import com.dress.dressrenting.model.Category;
-import com.dress.dressrenting.model.ColorAndSize;
-import com.dress.dressrenting.model.Product;
-import com.dress.dressrenting.model.ProductOffer;
+import com.dress.dressrenting.model.*;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
@@ -20,7 +17,8 @@ import java.util.stream.Collectors;
 public interface ProductMapper {
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
-    @Mapping(target = "category", expression = "java(mapCategory(productRequestDto.getCategoryId()))")
+    @Mapping(target = "subCategory", expression = "java(mapSubcategory(productRequestDto.getSubCategoryId()))")
+    @Mapping(target = "brand", expression = "java(mapBrand(productRequestDto.getBrandId()))")
     Product toEntity(ProductRequestDto productRequestDto);
 
     @Mapping(target = "productCode", source = "productCode")
@@ -29,9 +27,9 @@ public interface ProductMapper {
     @Mapping(target = "userSurname", source = "user.surname")
     @Mapping(target = "userEmail", source = "user.email")
     @Mapping(target = "userPhone", source = "user.phone")
-    @Mapping(target = "category", source = "category")
+    @Mapping(target = "subCategory", source = "subCategory")
     @Mapping(target = "description", source = "description")
-    @Mapping(target = "genders", expression = "java(product.getCategory().getGenders())")
+    @Mapping(target = "genders", expression = "java(product.getSubCategory().getGenders())")
     @Mapping(target = "colorAndSizes", expression = "java(mapColorAndSizes(product.getColorAndSizes()))")
     @Mapping(target = "offers", source = "productOffers")
     ProductResponseDto toDto(Product product);
@@ -56,12 +54,20 @@ public interface ProductMapper {
 
     List<ColorAndSize> toColorAndSizeList(List<ColorAndSizeRequestDto> dtos);
 
-    default Category mapCategory(Long categoryId) {
-        if (categoryId == null) return null;
-        Category category = new Category();
-        category.setId(categoryId);
-        return category;
+    default SubCategory mapSubcategory(Long subcategoryId) {
+        if (subcategoryId == null) return null;
+        SubCategory subCategory = new SubCategory();
+        subCategory.setId(subcategoryId);
+        return subCategory;
     }
+
+    default Brand mapBrand(Long brandId) {
+        if (brandId == null) return null;
+        Brand brand = new Brand();
+        brand.setId(brandId);
+        return brand;
+    }
+
     default List<ProductOfferResponseDto> mapOffers(List<ProductOffer> list) {
         if (list == null) return List.of();
         return list.stream()
@@ -74,6 +80,7 @@ public interface ProductMapper {
                 ))
                 .toList();
     }
+
     default CategoryResponseDto mapCategoryToDto(Category category) {
         if (category == null) return null;
         return new CategoryResponseDto(category.getId(), category.getName());

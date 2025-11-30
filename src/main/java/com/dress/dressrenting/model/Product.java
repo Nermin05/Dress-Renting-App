@@ -20,7 +20,7 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-@JsonIgnoreProperties({"hibernateLazyInitializer","handler"})
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Product {
 
     @Id
@@ -35,9 +35,9 @@ public class Product {
     User user;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "category_id", nullable = true)
+    @JoinColumn(name = "subCategory_id", nullable = true)
     @OnDelete(action = OnDeleteAction.SET_NULL)
-    Category category;
+    SubCategory subCategory;
 
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference
@@ -50,6 +50,10 @@ public class Product {
     ProductStatus productStatus;
 
     Instant createdAt;
+
+    @ManyToOne
+    @JoinColumn(name = "brand_id")
+    Brand brand;
 
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
     List<ProductOffer> productOffers;
