@@ -14,10 +14,10 @@ spring:
         dialect: org.hibernate.dialect.PostgreSQLDialect
 
   mail:
-    host: smtp.gmail.com
+    host: ${BREVO_HOST}
     port: 587
-    username: memmedlinermin205@gmail.com
-    password: cxwyxtidljofkyph
+    username: ${BREVO_USERNAME}
+    password: ${BREVO_PASSWORD}
     protocol: smtp
     properties:
       mail:
