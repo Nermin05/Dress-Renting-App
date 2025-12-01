@@ -85,6 +85,8 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedOrigins(List.of(
+                "http://localhost:5173",
+                "http://127.0.0.1:*",
                 "https://test.weshare.az",
                 "https://weshare.az",
                 "https://www.weshare.az"
