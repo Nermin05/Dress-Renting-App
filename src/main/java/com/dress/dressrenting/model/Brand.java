@@ -1,5 +1,6 @@
 package com.dress.dressrenting.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.*;
@@ -25,5 +26,6 @@ public class Brand {
     String name;
 
     @OneToMany(mappedBy = "brand", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
     List<Product> product;
 }

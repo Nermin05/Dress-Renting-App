@@ -278,8 +278,10 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public List<ProductResponseDto> filter(Long subCategoryId, Long brandId, Color color, List<String> sizes, Gender gender, BigDecimal minPrice, BigDecimal maxPrice) {
-        ProductFilterDto productFilterDto = new ProductFilterDto(subCategoryId, brandId, sizes, gender, color, minPrice, maxPrice);
+    public List<ProductResponseDto> filter(Long categoryId,Long subCategoryId, Long brandId, Color color, List<String> sizes, Gender gender,
+                                           BigDecimal minPrice, BigDecimal maxPrice,OfferType offerType,
+                                           ProductCondition productCondition) {
+        ProductFilterDto productFilterDto = new ProductFilterDto(categoryId,subCategoryId, brandId, sizes, gender, color, minPrice, maxPrice,offerType,productCondition);
         List<Product> filtered = productRepository.findAll(ProductSpecification.filter(productFilterDto));
         return productMapper.toDtoList(filtered);
     }

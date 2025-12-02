@@ -100,13 +100,16 @@ public class ProductController {
     }
 
     @GetMapping("/filter")
-    public ResponseEntity<List<ProductResponseDto>> filter(@RequestParam(required = false) Long subCategoryId,
+    public ResponseEntity<List<ProductResponseDto>> filter(@RequestParam(required = false) Long categoryId,
+                                                           @RequestParam(required = false) Long subCategoryId,
                                                            @RequestParam(required = false) Long brandId,
                                                            @RequestParam(required = false) Color color,
                                                            @RequestParam(required = false) List<String> sizes,
                                                            @RequestParam(required = false) Gender gender,
                                                            @RequestParam(required = false) BigDecimal minPrice,
-                                                           @RequestParam(required = false) BigDecimal maxPrice) {
-        return ResponseEntity.ok(productService.filter(subCategoryId, brandId, color, sizes, gender, minPrice, maxPrice));
+                                                           @RequestParam(required = false) BigDecimal maxPrice,
+                                                           @RequestParam(required = false) OfferType offerType,
+                                                           @RequestParam(required = false) ProductCondition productCondition) {
+        return ResponseEntity.ok(productService.filter(categoryId, subCategoryId, brandId, color, sizes, gender, minPrice, maxPrice, offerType, productCondition));
     }
 }

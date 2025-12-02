@@ -14,6 +14,9 @@ public class ProductSpecification {
 
             p = cb.and(p, cb.equal(root.get("productStatus"), ProductStatus.ACTIVE));
 
+            if (f.categoryId() != null)
+                p = cb.and(p, cb.equal(root.get("subCategory").get("category").get("id"), f.categoryId()));
+
             if (f.subCategoryId() != null)
                 p = cb.and(p, cb.equal(root.get("subCategory").get("id"), f.subCategoryId()));
 
@@ -42,6 +45,17 @@ public class ProductSpecification {
             if (f.maxPrice() != null)
                 p = cb.and(p, cb.lessThanOrEqualTo(root.get("price"), f.maxPrice()));
 
+            if (f.offerType() != null || f.productCondition() != null) {
+                var offerJoin = root.join("productOffers");
+
+                if (f.offerType() != null) {
+                    p = cb.and(p, cb.equal(offerJoin.get("offerType"), f.offerType()));
+                }
+
+                if (f.productCondition() != null) {
+                    p = cb.and(p, cb.equal(offerJoin.get("productCondition"), f.productCondition()));
+                }
+            }
             return p;
         };
     }
