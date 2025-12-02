@@ -8,10 +8,10 @@ import com.dress.dressrenting.model.enums.Gender;
 import com.dress.dressrenting.model.enums.OfferType;
 import com.dress.dressrenting.model.enums.ProductCondition;
 import com.dress.dressrenting.service.ProductService;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -34,6 +34,7 @@ import java.util.Map;
 @Slf4j
 public class ProductController {
     private final ProductService productService;
+    private final ObjectMapper objectMapper;
 
     @GetMapping("/all-products")
     public ResponseEntity<List<ProductResponseDto>> getAll() {
@@ -52,11 +53,13 @@ public class ProductController {
 
     @PostMapping(value = "/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ProductResponseDto> save(
-            @RequestPart("product") @Valid ProductRequestDto productRequestDto,
-            @RequestParam MultiValueMap<String, MultipartFile> filesMap) {
+            @RequestPart("product") String productJson,
+            @RequestParam MultiValueMap<String, MultipartFile> filesMap
+    ) throws JsonProcessingException {
+
+        ProductRequestDto productRequestDto = objectMapper.readValue(productJson, ProductRequestDto.class);
 
         Map<String, List<MultipartFile>> colorImages = new HashMap<>();
-
         filesMap.forEach((key, value) -> {
             if (key.startsWith("images_")) {
                 String colorKey = key.substring("images_".length()).toUpperCase();
@@ -67,7 +70,6 @@ public class ProductController {
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(productService.save(productRequestDto, colorImages));
     }
-
 
     @PutMapping(value = "/{productCode}/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ProductResponseDto> update(
@@ -98,12 +100,13 @@ public class ProductController {
     }
 
     @GetMapping("/filter")
-    public ResponseEntity<List<ProductResponseDto>> filter(@RequestParam(required = false) Long categoryId,
+    public ResponseEntity<List<ProductResponseDto>> filter(@RequestParam(required = false) Long subCategoryId,
+                                                           @RequestParam(required = false) Long brandId,
                                                            @RequestParam(required = false) Color color,
                                                            @RequestParam(required = false) List<String> sizes,
                                                            @RequestParam(required = false) Gender gender,
                                                            @RequestParam(required = false) BigDecimal minPrice,
                                                            @RequestParam(required = false) BigDecimal maxPrice) {
-        return ResponseEntity.ok(productService.filter(categoryId, color, sizes, gender, minPrice, maxPrice));
+        return ResponseEntity.ok(productService.filter(subCategoryId, brandId, color, sizes, gender, minPrice, maxPrice));
     }
 }

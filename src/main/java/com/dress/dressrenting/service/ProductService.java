@@ -28,7 +28,7 @@ public interface ProductService {
 
     void delete(String productCode);
 
-    List<ProductResponseDto> filter(Long categoryId, Color color, List<String> sizes, Gender gender, BigDecimal minPrice, BigDecimal maxPrice);
+    List<ProductResponseDto> filter(Long subCategoryId, Long brandId, Color color, List<String> sizes, Gender gender, BigDecimal minPrice, BigDecimal maxPrice);
 
     void changeStatus(String productCode, ProductStatus productStatus);
 

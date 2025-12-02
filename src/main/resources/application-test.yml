@@ -1,0 +1,32 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/dress_renting_test
+    username: postgres
+    password: postgres
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: false
+  mail:
+    host: localhost
+    port: 2525
+    username: test
+    password: test
+    properties:
+      mail.smtp.auth: false
+      mail.smtp.starttls.enable: false
+
+cloudinary:
+  cloud:
+    name: test
+  api:
+    key: test
+    secret: test
+
+jwt:
+  secret: test-secret-at-least-32-chars
+  jwtExpirationMs: 600000
+  refreshExpirationMs: 86400000
+
+server:
+  port: 0

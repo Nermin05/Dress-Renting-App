@@ -11,39 +11,56 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Mapper(componentModel = "spring")
 public interface ProductMapper {
+
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "subCategory", expression = "java(mapSubcategory(productRequestDto.getSubCategoryId()))")
     @Mapping(target = "brand", expression = "java(mapBrand(productRequestDto.getBrandId()))")
     Product toEntity(ProductRequestDto productRequestDto);
 
+    @Mapping(target = "id", source = "id")
     @Mapping(target = "productCode", source = "productCode")
-    @Mapping(target = "userName", source = "user.name")
+
     @Mapping(target = "userId", source = "user.id")
+    @Mapping(target = "userName", source = "user.name")
     @Mapping(target = "userSurname", source = "user.surname")
     @Mapping(target = "userEmail", source = "user.email")
     @Mapping(target = "userPhone", source = "user.phone")
-    @Mapping(target = "subCategory", source = "subCategory")
+
+    @Mapping(target = "subCategoryId",
+            expression = "java(product.getSubCategory()==null? null : product.getSubCategory().getId())")
+    @Mapping(target = "subCategoryName",
+            expression = "java(product.getSubCategory()==null? null : product.getSubCategory().getName())")
+
+    @Mapping(target = "brandId",
+            expression = "java(product.getBrand()==null? null : product.getBrand().getId())")
+    @Mapping(target = "brandName",
+            expression = "java(product.getBrand()==null? null : product.getBrand().getName())")
+
+    @Mapping(target = "price", source = "price")
     @Mapping(target = "description", source = "description")
-    @Mapping(target = "genders", expression = "java(product.getSubCategory().getGenders())")
+
+    @Mapping(target = "genders",
+            expression = "java(product.getSubCategory()==null ? java.util.List.of() : product.getSubCategory().getGenders())")
+
     @Mapping(target = "colorAndSizes", expression = "java(mapColorAndSizes(product.getColorAndSizes()))")
-    @Mapping(target = "offers", source = "productOffers")
+    @Mapping(target = "offers", expression = "java(mapOffers(product.getProductOffers()))")
+    @Mapping(target = "createdAt", source = "createdAt")
     ProductResponseDto toDto(Product product);
 
 
     default List<ColorAndSizeResponseDto> mapColorAndSizes(List<ColorAndSize> list) {
-        if (list == null) return List.of();
+        if (list == null) return java.util.List.of();
         return list.stream().map(cs -> {
             ColorAndSizeResponseDto dto = new ColorAndSizeResponseDto();
             dto.setColor(cs.getColor() != null ? cs.getColor().name() : null);
             dto.setSizes(cs.getSizes());
             dto.setImageUrls(cs.getImageUrls());
             return dto;
-        }).collect(Collectors.toList());
+        }).collect(java.util.stream.Collectors.toList());
     }
 
     List<ProductResponseDto> toDtoList(List<Product> products);
@@ -69,30 +86,20 @@ public interface ProductMapper {
     }
 
     default List<ProductOfferResponseDto> mapOffers(List<ProductOffer> list) {
-        if (list == null) return List.of();
+        if (list == null) return java.util.List.of();
         return list.stream()
                 .map(o -> new ProductOfferResponseDto(
                         o.getId(),
-                        o.getOfferType().name(),
+                        o.getOfferType() == null ? null : o.getOfferType().name(),
                         o.getPrice(),
-                        o.getProductCondition().name(),
+                        o.getProductCondition() == null ? null : o.getProductCondition().name(),
                         o.getRentDuration()
                 ))
-                .toList();
+                .collect(java.util.stream.Collectors.toList());
     }
 
     default CategoryResponseDto mapCategoryToDto(Category category) {
         if (category == null) return null;
         return new CategoryResponseDto(category.getId(), category.getName());
     }
-
-
 }
-
-//    default User mapUser(Long userId) {
-//        if (userId == null) return null;
-//        User user = new User();
-//        user.setId(userId);
-//        return user;
-//    }
-//}
