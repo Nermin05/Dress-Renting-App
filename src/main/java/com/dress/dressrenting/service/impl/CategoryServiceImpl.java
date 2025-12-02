@@ -17,9 +17,8 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public Category create(CategoryRequestDto categoryRequestDto) {
-        Category category=Category.builder()
+        Category category = Category.builder()
                 .name(categoryRequestDto.name())
-                .genders(categoryRequestDto.genders())
                 .build();
         return repository.save(category);
     }
@@ -29,7 +28,6 @@ public class CategoryServiceImpl implements CategoryService {
         Category existing = repository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Category not found with id " + id));
         existing.setName(categoryRequestDto.name());
-        existing.setGenders(categoryRequestDto.genders());
         return repository.save(existing);
     }
 

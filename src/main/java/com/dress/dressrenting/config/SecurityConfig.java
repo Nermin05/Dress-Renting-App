@@ -60,12 +60,10 @@ public class SecurityConfig {
                                 "/api/v1/products",
                                 "/api/v1/products/**",
                                 "/api/v1/products/filter",
-                                "/api/categories",
-                                "/api/categories/**",
-                                "/api/sub-categories",
-                                "/api/sub-categories/**",
-                                "api/v1/favorites/**"
-                        ).permitAll()
+                                "/api/v1/categories/**",
+                                "/api/v1/sub-categories/**",
+                                "/api/v1/brands/**"
+                                ).permitAll()
                         .requestMatchers("/api/v1/admin-controller/**").hasAuthority("ADMIN")
                         .anyRequest().authenticated()
                 )
@@ -75,6 +73,9 @@ public class SecurityConfig {
                 )
                 .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authenticationProvider(customAuthenticationProvider)
+
+             //   .addFilterBefore(new RefererCheckFilter(), UsernamePasswordAuthenticationFilter.class)
+
                 .addFilterBefore(jwtFilter(), UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
@@ -85,14 +86,15 @@ public class SecurityConfig {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedOrigins(List.of(
                 "http://localhost:5173",
-                "http://localhost:8081",
-                "http://38.242.147.61",
+                "http://127.0.0.1:*",
+                "https://test.weshare.az",
                 "https://weshare.az",
                 "https://www.weshare.az"
         ));
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-        configuration.setAllowedHeaders(List.of("*"));
+        configuration.setAllowedHeaders(List.of("Authorization", "Content-Type", "X-Requested-With", "Accept"));
         configuration.setAllowCredentials(true);
+
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
         return source;

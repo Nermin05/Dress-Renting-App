@@ -28,11 +28,13 @@ public interface ProductService {
 
     void delete(String productCode);
 
-    List<ProductResponseDto> filter(Long categoryId, Color color, List<String> sizes, Gender gender, BigDecimal minPrice, BigDecimal maxPrice);
+    List<ProductResponseDto> filter(Long categoryId, Long subCategoryId, Long brandId, Color color, List<String> sizes, Gender gender, BigDecimal minPrice,
+                                    BigDecimal maxPrice, OfferType offerType,
+                                    ProductCondition productCondition);
 
     void changeStatus(String productCode, ProductStatus productStatus);
 
     List<ProductResponseDto> approveProduct(String productCode);
 
-    List<ProductResponseDto> disapproveProduct(String productCode);
+    ProductResponseDto disapproveProduct(String productCode);
 }

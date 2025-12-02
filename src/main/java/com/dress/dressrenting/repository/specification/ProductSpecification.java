@@ -1,54 +1,63 @@
 package com.dress.dressrenting.repository.specification;
 
 import com.dress.dressrenting.dto.request.ProductFilterDto;
-import com.dress.dressrenting.model.Category;
-import com.dress.dressrenting.model.ColorAndSize;
 import com.dress.dressrenting.model.Product;
-import com.dress.dressrenting.model.enums.Gender;
 import com.dress.dressrenting.model.enums.ProductStatus;
-import jakarta.persistence.criteria.Join;
-import jakarta.persistence.criteria.Predicate;
 import org.springframework.data.jpa.domain.Specification;
 
 public class ProductSpecification {
 
-    public static Specification<Product> filter(ProductFilterDto productFilterDto) {
-        return (root, query, criteriaBuilder) -> {
-            Predicate predicates = criteriaBuilder.conjunction();
+    public static Specification<Product> filter(ProductFilterDto f) {
+        return (root, query, cb) -> {
+            query.distinct(true);
+            var p = cb.conjunction();
 
-            predicates = criteriaBuilder.and(predicates, criteriaBuilder.equal(root.get("productStatus"), ProductStatus.ACTIVE));
+            p = cb.and(p, cb.equal(root.get("productStatus"), ProductStatus.ACTIVE));
 
+            if (f.categoryId() != null)
+                p = cb.and(p, cb.equal(root.get("subCategory").get("category").get("id"), f.categoryId()));
 
-            if (productFilterDto.categoryId() != null) {
-                predicates = criteriaBuilder.and(predicates, criteriaBuilder.equal(root.get("category").get("id"), productFilterDto.categoryId()));
-            }
+            if (f.subCategoryId() != null)
+                p = cb.and(p, cb.equal(root.get("subCategory").get("id"), f.subCategoryId()));
 
-            if (productFilterDto.color() != null || productFilterDto.sizes() != null) {
-                Join<Product, ColorAndSize> colorAndSizes = root.join("colorAndSizes");
-                if (productFilterDto.color() != null) {
-                    predicates = criteriaBuilder.and(predicates, criteriaBuilder.equal(colorAndSizes.get("color"), productFilterDto.color()));
+            if (f.brandId() != null)
+                p = cb.and(p, cb.equal(root.get("brand").get("id"), f.brandId()));
+
+            if (f.color() != null || (f.sizes() != null && !f.sizes().isEmpty())) {
+                var colorAndSizes = root.join("colorAndSizes");
+                if (f.color() != null)
+                    p = cb.and(p, cb.equal(colorAndSizes.get("color"), f.color()));
+                if (f.sizes() != null && !f.sizes().isEmpty()) {
+                    var sizesJoin = colorAndSizes.join("sizes");
+                    p = cb.and(p, sizesJoin.in(f.sizes()));
                 }
-                if (productFilterDto.sizes() != null && !productFilterDto.sizes().isEmpty()) {
-                    Join<ColorAndSize, String> sizesJoin = colorAndSizes.join("sizes");
-                    predicates = criteriaBuilder.and(predicates, sizesJoin.in(productFilterDto.sizes()));
-                }
-            }
-            if (productFilterDto.gender() != null) {
-                Join<Product, Category> categoryJoin = root.join("category");
-                Join<Category, Gender> genderJoin = categoryJoin.join("genders");
-                predicates = criteriaBuilder.and(
-                        predicates, criteriaBuilder.equal(genderJoin, productFilterDto.gender())
-                );
-            }
-            if (productFilterDto.minPrice() != null) {
-                predicates = criteriaBuilder.and(predicates, criteriaBuilder.greaterThanOrEqualTo(root.get("price"),
-                        productFilterDto.minPrice()));
-            }
-            if (productFilterDto.maxPrice() != null) {
-                predicates = criteriaBuilder.and(predicates, criteriaBuilder.lessThanOrEqualTo(root.get("price"), productFilterDto.maxPrice()));
             }
 
-            return predicates;
+            if (f.gender() != null) {
+                var subCat = root.join("subCategory");
+                var genders = subCat.join("genders");
+                p = cb.and(p, cb.equal(genders, f.gender()));
+            }
+
+            if (f.minPrice() != null)
+                p = cb.and(p, cb.greaterThanOrEqualTo(root.get("price"), f.minPrice()));
+
+            if (f.maxPrice() != null)
+                p = cb.and(p, cb.lessThanOrEqualTo(root.get("price"), f.maxPrice()));
+
+            if (f.offerType() != null || f.productCondition() != null) {
+                var offerJoin = root.join("productOffers");
+
+                if (f.offerType() != null) {
+                    p = cb.and(p, cb.equal(offerJoin.get("offerType"), f.offerType()));
+                }
+
+                if (f.productCondition() != null) {
+                    p = cb.and(p, cb.equal(offerJoin.get("productCondition"), f.productCondition()));
+                }
+            }
+            return p;
         };
     }
+
 }

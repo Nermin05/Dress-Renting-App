@@ -13,8 +13,23 @@ spring:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
 
+  mail:
+    host: ${BREVO_HOST}
+    port: 587
+    username: ${BREVO_USERNAME}
+    password: ${BREVO_PASSWORD}
+    protocol: smtp
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+          ssl:
+            enable: false
+    default-encoding: UTF-8
 server:
-  port: 8081
+  port: 8085
 
 cloudinary:
   cloud:
@@ -24,6 +39,6 @@ cloudinary:
     secret: iKNxSLdUW3Tqyn7ZQk56UzmdNiY
 
 jwt:
-  secret: "Q1dHb2lVbldmZ1pDb1ZyT0p0T1l0cERLVEpLQkRWRU1NTEdMQU1VTVVNRVJUTlNUVVJHRVJHQjA0Q0xBVE1FVFRFUjEyMzQ1Njc4OTAx"
+  secret: "Q1dbkjbkbkhkvgjtycycyrHb2lVbldmZ1pDb1ZyT0p0T1l0cERLVEpLQkRWRU1NTEdMQU1VTVVNRVJUTlNUVVJHRVJHQjA0Q0xBVE1FVFRFUjEyMzQ1Njc4OTAx"
   jwtExpirationMs: 600000
   refreshExpirationMs: 86400000

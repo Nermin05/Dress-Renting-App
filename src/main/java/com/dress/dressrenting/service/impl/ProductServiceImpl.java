@@ -8,9 +8,9 @@ import com.dress.dressrenting.exception.exceptions.NotFoundException;
 import com.dress.dressrenting.mapper.ProductMapper;
 import com.dress.dressrenting.model.*;
 import com.dress.dressrenting.model.enums.*;
-import com.dress.dressrenting.repository.CategoryRepository;
 import com.dress.dressrenting.repository.ProductOfferRepository;
 import com.dress.dressrenting.repository.ProductRepository;
+import com.dress.dressrenting.repository.SubCategoryRepository;
 import com.dress.dressrenting.repository.UserRepository;
 import com.dress.dressrenting.repository.specification.ProductSpecification;
 import com.dress.dressrenting.service.ProductService;
@@ -34,7 +34,8 @@ public class ProductServiceImpl implements ProductService {
     private final ProductMapper productMapper;
     private final ProductOfferRepository productOfferRepository;
     private final UserRepository userRepository;
-    private final CategoryRepository categoryRepository;
+    private final SubCategoryRepository subCategoryRepository;
+    private final EmailService emailService;
 
     @Override
     public List<ProductResponseDto> getAll() {
@@ -82,22 +83,26 @@ public class ProductServiceImpl implements ProductService {
 
         Product product = productMapper.toEntity(productRequestDto);
 
-        User user = new User();
-        user.setName(productRequestDto.getUserName());
-        user.setSurname(productRequestDto.getUserSurname());
-        user.setEmail(productRequestDto.getUserEmail());
-        user.setPhone(productRequestDto.getUserPhone());
-        user.setUserRole(UserRole.USER);
-        user = userRepository.save(user);
+        User user = userRepository
+                .findByEmail(productRequestDto.getUserEmail())
+                .orElseGet(() -> {
+                    User newUser = new User();
+                    newUser.setName(productRequestDto.getUserName());
+                    newUser.setSurname(productRequestDto.getUserSurname());
+                    newUser.setEmail(productRequestDto.getUserEmail());
+                    newUser.setPhone(productRequestDto.getUserPhone());
+                    newUser.setUserRole(UserRole.USER);
+                    return userRepository.save(newUser);
+                });
 
         product.setUser(user);
         product = productRepository.save(product);
 
-        if (productRequestDto.getCategoryId() != null) {
-            Category category = categoryRepository.findById(productRequestDto.getCategoryId())
-                    .orElseThrow(() -> new NotFoundException("Category not found"));
-            product.setCategory(category);
-            product.getCategory().setGenders(productRequestDto.getGenders());
+        if (productRequestDto.getSubCategoryId() != null) {
+            SubCategory subCategory = subCategoryRepository.findById(productRequestDto.getSubCategoryId())
+                    .orElseThrow(() -> new NotFoundException("Subcategory not found"));
+            product.setSubCategory(subCategory);
+            product.getSubCategory().setGenders(productRequestDto.getGenders());
         }
 
         Product finalProduct = product;
@@ -273,8 +278,10 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public List<ProductResponseDto> filter(Long categoryId, Color color, List<String> sizes, Gender gender, BigDecimal minPrice, BigDecimal maxPrice) {
-        ProductFilterDto productFilterDto = new ProductFilterDto(categoryId, sizes, gender, color, minPrice, maxPrice);
+    public List<ProductResponseDto> filter(Long categoryId,Long subCategoryId, Long brandId, Color color, List<String> sizes, Gender gender,
+                                           BigDecimal minPrice, BigDecimal maxPrice,OfferType offerType,
+                                           ProductCondition productCondition) {
+        ProductFilterDto productFilterDto = new ProductFilterDto(categoryId,subCategoryId, brandId, sizes, gender, color, minPrice, maxPrice,offerType,productCondition);
         List<Product> filtered = productRepository.findAll(ProductSpecification.filter(productFilterDto));
         return productMapper.toDtoList(filtered);
     }
@@ -291,15 +298,51 @@ public class ProductServiceImpl implements ProductService {
         Product product = findByProductCode(productCode);
         product.setProductStatus(ProductStatus.ACTIVE);
         productRepository.save(product);
+        StringBuilder body = new StringBuilder();
+
+        body.append("Dəyərli müştəri, ")
+                .append("</a><br><br>")
+                .append(productCode)
+                .append(" nömrəli məhsulunuz təsdiq olunmuşdur.<br>")
+                .append("Sizə xidmət etməkdən məmnunluq duyuruq.<br>")
+                .append("Məhsula baxmaq üçün link: ")
+                .append("<a href=\"https://test.weshare.az/")
+                .append(productCode)
+                .append("\">https://test.weshare.az/")
+                .append(productCode)
+                .append("</a><br><br>")
+                .append("Bizimlə əlaqə saxlamaq üçün aşağıdakı nömrəyə zəng edə bilərsiniz:<br>")
+                .append("<a href=\"tel:+994993626260\">+994 993 62 62 60</a><br><br>")
+                .append("Hörmətlə,<br>")
+                .append("WeShare");
+
+        emailService.sendEmail(product.getUser().getEmail(), "Məhsul statusu haqqında bildiriş", body.toString());
         return productMapper.toDtoList(productRepository.findByProductStatus(ProductStatus.ACTIVE));
     }
 
     @Override
-    public List<ProductResponseDto> disapproveProduct(String productCode) {
+    public ProductResponseDto disapproveProduct(String productCode) {
         Product product = findByProductCode(productCode);
         product.setProductStatus(ProductStatus.DELETED);
         productRepository.save(product);
-        return productMapper.toDtoList(productRepository.findByProductStatus(ProductStatus.ACTIVE));
+        StringBuilder body = new StringBuilder();
+
+        body.append("Dəyərli müştəri, ")
+                .append("</a><br><br>")
+                .append(productCode)
+                .append(" nömrəli məhsulunuz təəssüf ki, təsdiq edilməmişdir.<br>")
+                .append("Zəhmət olmasa məlumatları yenidən yoxlayıb təkrar göndərməyiniz xahiş olunur.")
+                .append("</a><br><br>")
+                .append("Hər hansı sualınız olarsa, bizimlə əlaqə saxlaya bilərsiniz:<br>")
+                .append("<a href=\"tel:+994993626260\">+994 993 62 62 60</a><br><br>")
+                .append("Hörmətlə,<br>")
+                .append("WeShare");
+
+        emailService.sendEmail(
+                product.getUser().getEmail(),
+                "Məhsul statusu haqqında bildiriş", body.toString()
+        );
+        return productMapper.toDto(product);
     }
 
     private Product findByProductCode(String productCode) {
